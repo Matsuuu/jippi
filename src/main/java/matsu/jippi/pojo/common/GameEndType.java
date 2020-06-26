@@ -1,6 +1,8 @@
 package matsu.jippi.pojo.common;
 
-public class GameEndType {
+import matsu.jippi.interfaces.EventPayloadTypes;
+
+public class GameEndType implements EventPayloadTypes {
     private Integer gameEndMethod;
     private Integer lrasInitiatorIndex;
 

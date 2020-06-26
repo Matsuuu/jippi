@@ -6,9 +6,9 @@ import matsu.jippi.interfaces.SlpRefType;
 
 public class SlpFileType {
     private SlpRefType ref;
-    private float rawDataPosition;
+    private int rawDataPosition;
     private int rawDataLength;
-    private float metadataPosition;
+    private int metadataPosition;
     private int metadataLength;
     private Map<Integer, Integer> messageSizes;
 
@@ -20,28 +20,12 @@ public class SlpFileType {
         this.ref = ref;
     }
 
-    public float getRawDataPosition() {
-        return rawDataPosition;
-    }
-
-    public void setRawDataPosition(float rawDataPosition) {
-        this.rawDataPosition = rawDataPosition;
-    }
-
     public int getRawDataLength() {
         return rawDataLength;
     }
 
     public void setRawDataLength(int rawDataLength) {
         this.rawDataLength = rawDataLength;
-    }
-
-    public float getMetadataPosition() {
-        return metadataPosition;
-    }
-
-    public void setMetadataPosition(float metadataPosition) {
-        this.metadataPosition = metadataPosition;
     }
 
     public int getMetadataLength() {
@@ -71,6 +55,22 @@ public class SlpFileType {
         this.metadataPosition = metadataPosition;
         this.metadataLength = metadataLength;
         this.messageSizes = messageSizes;
+    }
+
+    public int getRawDataPosition() {
+        return rawDataPosition;
+    }
+
+    public void setRawDataPosition(int rawDataPosition) {
+        this.rawDataPosition = rawDataPosition;
+    }
+
+    public int getMetadataPosition() {
+        return metadataPosition;
+    }
+
+    public void setMetadataPosition(int metadataPosition) {
+        this.metadataPosition = metadataPosition;
     }
 
 }

@@ -1,13 +1,13 @@
 package matsu.jippi.pojo.slpreader;
 
-import java.nio.Buffer;
+import java.nio.ByteBuffer;
 
 import matsu.jippi.enumeration.slpreader.SlpInputSource;
 import matsu.jippi.interfaces.SlpRefType;
 
 public class SlpBufferSourceRef implements SlpRefType {
     private SlpInputSource source;
-    private Buffer buffer;
+    private ByteBuffer buffer;
 
     public SlpInputSource getSource() {
         return source;
@@ -17,18 +17,18 @@ public class SlpBufferSourceRef implements SlpRefType {
         this.source = source;
     }
 
-    public Buffer getBuffer() {
+    public ByteBuffer getBuffer() {
         return buffer;
     }
 
-    public void setBuffer(Buffer buffer) {
+    public void setBuffer(ByteBuffer buffer) {
         this.buffer = buffer;
     }
 
     public SlpBufferSourceRef() {
     }
 
-    public SlpBufferSourceRef(SlpInputSource source, Buffer buffer) {
+    public SlpBufferSourceRef(SlpInputSource source, ByteBuffer buffer) {
         this.source = source;
         this.buffer = buffer;
     }

@@ -1,6 +1,6 @@
 package matsu.jippi.pojo.slpreader;
 
-import java.nio.Buffer;
+import java.nio.ByteBuffer;
 
 import matsu.jippi.enumeration.slpreader.SlpInputSource;
 
@@ -8,9 +8,9 @@ public class SlpReadInput {
 
     private SlpInputSource source;
     private String filePath;
-    private Buffer buffer;
+    private ByteBuffer buffer;
 
-    public SlpReadInput(SlpInputSource source, String filePath, Buffer buffer) {
+    public SlpReadInput(SlpInputSource source, String filePath, ByteBuffer buffer) {
         this.source = source;
         this.filePath = filePath;
         this.buffer = buffer;
@@ -24,8 +24,20 @@ public class SlpReadInput {
         return filePath;
     }
 
-    public Buffer getBuffer() {
+    public ByteBuffer getBuffer() {
         return buffer;
+    }
+
+    public void setSource(SlpInputSource source) {
+        this.source = source;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public void setBuffer(ByteBuffer buffer) {
+        this.buffer = buffer;
     }
 
 }

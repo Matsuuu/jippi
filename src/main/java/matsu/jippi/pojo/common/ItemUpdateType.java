@@ -1,10 +1,12 @@
 package matsu.jippi.pojo.common;
 
-public class ItemUpdateType {
+import matsu.jippi.interfaces.EventPayloadTypes;
+
+public class ItemUpdateType implements EventPayloadTypes {
     private Integer frame;
     private Integer typeId;
     private Integer state;
-    private Integer facingDirection;
+    private Float facingDirection;
     private Float velocityX;
     private Float velocityY;
     private Float positionX;
@@ -16,7 +18,7 @@ public class ItemUpdateType {
     public ItemUpdateType() {
     }
 
-    public ItemUpdateType(Integer frame, Integer typeId, Integer state, Integer facingDirection, Float velocityX,
+    public ItemUpdateType(Integer frame, Integer typeId, Integer state, Float facingDirection, Float velocityX,
             Float velocityY, Float positionX, Float positionY, Float damageTaken, Float expirationTimer,
             Integer spawnId) {
         this.frame = frame;
@@ -56,11 +58,11 @@ public class ItemUpdateType {
         this.state = state;
     }
 
-    public Integer getFacingDirection() {
+    public Float getFacingDirection() {
         return facingDirection;
     }
 
-    public void setFacingDirection(Integer facingDirection) {
+    public void setFacingDirection(Float facingDirection) {
         this.facingDirection = facingDirection;
     }
 

@@ -2,7 +2,9 @@ package matsu.jippi.pojo.common;
 
 import java.util.List;
 
-public class GameStartType {
+import matsu.jippi.interfaces.EventPayloadTypes;
+
+public class GameStartType implements EventPayloadTypes {
     private String slpVersion;
     private boolean isTeams;
     private boolean isPAL;

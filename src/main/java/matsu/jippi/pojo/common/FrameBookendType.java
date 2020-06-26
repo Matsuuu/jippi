@@ -1,6 +1,8 @@
 package matsu.jippi.pojo.common;
 
-public class FrameBookendType {
+import matsu.jippi.interfaces.EventPayloadTypes;
+
+public class FrameBookendType implements EventPayloadTypes {
     private Integer frame;
 
     public FrameBookendType(Integer frame) {
