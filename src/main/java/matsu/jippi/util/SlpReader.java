@@ -212,7 +212,7 @@ public class SlpReader {
             case POST_FRAME_UPDATE:
                 return new PostFrameUpdateType(payload.getInt(0x1), payload.getInt(0x5), payload.get(0x6) == 1,
                         payload.getInt(0x7), payload.getInt(0x8), payload.getFloat(0xA), payload.getFloat(0xE),
-                        payload.getInt(0x12), payload.getFloat(0x16), payload.getFloat(0x1A), payload.getInt(0x1E),
+                        payload.getInt(0x12), payload.getInt(0x16), payload.getFloat(0x1A), payload.getInt(0x1E),
                         payload.getInt(0x1F), payload.getInt(0x20), payload.getInt(0x21), payload.getInt(0x22),
                         payload.getInt(0x33));
             case ITEM_UPDATE:

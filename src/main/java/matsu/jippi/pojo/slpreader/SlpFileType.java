@@ -47,16 +47,6 @@ public class SlpFileType {
     public SlpFileType() {
     }
 
-    public SlpFileType(SlpRefType ref, float rawDataPosition, int rawDataLength, float metadataPosition,
-            int metadataLength, Map<Integer, Integer> messageSizes) {
-        this.ref = ref;
-        this.rawDataPosition = rawDataPosition;
-        this.rawDataLength = rawDataLength;
-        this.metadataPosition = metadataPosition;
-        this.metadataLength = metadataLength;
-        this.messageSizes = messageSizes;
-    }
-
     public int getRawDataPosition() {
         return rawDataPosition;
     }
@@ -71,6 +61,16 @@ public class SlpFileType {
 
     public void setMetadataPosition(int metadataPosition) {
         this.metadataPosition = metadataPosition;
+    }
+
+    public SlpFileType(SlpRefType ref, int rawDataPosition, int rawDataLength, int metadataPosition, int metadataLength,
+            Map<Integer, Integer> messageSizes) {
+        this.ref = ref;
+        this.rawDataPosition = rawDataPosition;
+        this.rawDataLength = rawDataLength;
+        this.metadataPosition = metadataPosition;
+        this.metadataLength = metadataLength;
+        this.messageSizes = messageSizes;
     }
 
 }
