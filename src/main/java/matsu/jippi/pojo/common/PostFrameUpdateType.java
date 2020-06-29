@@ -11,7 +11,7 @@ public class PostFrameUpdateType implements EventPayloadTypes {
     private Float positionX;
     private Float positionY;
     private Integer facingDirection;
-    private Float percent;
+    private Integer percent;
     private Float shieldSize;
     private Integer lastAttackLanded;
     private Integer currentComboCount;
@@ -24,7 +24,7 @@ public class PostFrameUpdateType implements EventPayloadTypes {
     }
 
     public PostFrameUpdateType(Integer frame, Integer playerIndex, boolean isFollower, Integer internalCharacterId,
-            Integer actionStateId, Float positionX, Float positionY, Integer facingDirection, Float percent,
+            Integer actionStateId, Float positionX, Float positionY, Integer facingDirection, Integer percent,
             Float shieldSize, Integer lastAttackLanded, Integer currentComboCount, Integer lastHitBy,
             Integer stocksRemaining, Integer actionStateCounter, Integer lCancelStatus) {
         this.frame = frame;
@@ -109,11 +109,11 @@ public class PostFrameUpdateType implements EventPayloadTypes {
         this.facingDirection = facingDirection;
     }
 
-    public Float getPercent() {
+    public Integer getPercent() {
         return percent;
     }
 
-    public void setPercent(Float percent) {
+    public void setPercent(Integer percent) {
         this.percent = percent;
     }
 
