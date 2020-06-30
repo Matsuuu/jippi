@@ -16,7 +16,7 @@ import matsu.jippi.pojo.common.MoveLandedType;
 import matsu.jippi.pojo.common.PlayerIndexedType;
 import matsu.jippi.pojo.common.PostFrameUpdateType;
 
-public class ComboComputer {
+public class ComboComputer implements StatComputer<List<ComboType>> {
 
     private List<PlayerIndexedType> playerPermutations = new ArrayList<>();
     private Map<PlayerIndexedType, ComboState> state = new HashMap<>();
@@ -33,7 +33,7 @@ public class ComboComputer {
     public void processFrame(FrameEntryType frame, FramesType allFrames) {
         playerPermutations.forEach((indices) -> {
             ComboState comboState = state.get(indices);
-            handleComboCompute(comboState);
+            handleComboCompute(allFrames, comboState, indices, frame);
         });
     }
 
@@ -42,7 +42,7 @@ public class ComboComputer {
     }
 
     public void handleComboCompute(FramesType frames, ComboState comboState, PlayerIndexedType indices,
-            FrameEntryType frame, List<ComboType> combos) {
+            FrameEntryType frame) {
 
         PostFrameUpdateType playerFrame = frame.getPlayers().get(indices.getPlayerIndex()).getPost();
         PostFrameUpdateType prevPlayerFrame = frames.getFrames().get(frames.getFrames().size() - 2).getPlayers()

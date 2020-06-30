@@ -14,7 +14,7 @@ import matsu.jippi.pojo.common.PlayerIndexedType;
 import matsu.jippi.pojo.common.PlayerInput;
 import matsu.jippi.pojo.common.PreFrameUpdateType;
 
-public class InputComputer {
+public class InputComputer implements StatComputer<List<PlayerInput>> {
     private List<PlayerIndexedType> playerPermutations = new ArrayList<>();
     private Map<PlayerIndexedType, PlayerInput> state = new HashMap<>();
 

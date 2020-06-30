@@ -18,7 +18,7 @@ import matsu.jippi.pojo.common.PlayerConversionState;
 import matsu.jippi.pojo.common.PlayerIndexedType;
 import matsu.jippi.pojo.common.PostFrameUpdateType;
 
-public class ConversionComputer {
+public class ConversionComputer implements StatComputer<List<ConversionType>> {
     private List<PlayerIndexedType> playerPermutations = new ArrayList<>();
     private List<ConversionType> conversions;
     private Map<PlayerIndexedType, PlayerConversionState> state = new HashMap<>();
@@ -131,7 +131,7 @@ public class ConversionComputer {
             }
         }
 
-        if (conversionState.getConversion == null) {
+        if (conversionState.getConversion() == null) {
             return;
         }
 
@@ -139,7 +139,7 @@ public class ConversionComputer {
         boolean opntDidLoseStock = StatsQuerier.didLoseStock(opponentFrame, prevOpponentFrame);
 
         if (!opntDidLoseStock) {
-            conversionState.getConversion().setCurrentPercent(opponentFrame.getPercentOrZero());
+            conversionState.getConversion().getDamageType().setCurrentPercent(opponentFrame.getPercentOrZero());
         }
 
         if (opntIsDamaged || opntIsGrabbed) {

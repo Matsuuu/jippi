@@ -10,11 +10,12 @@ import java.util.stream.Collectors;
 import matsu.jippi.enumeration.stats.State;
 import matsu.jippi.pojo.common.ActionCountsType;
 import matsu.jippi.pojo.common.FrameEntryType;
+import matsu.jippi.pojo.common.FramesType;
 import matsu.jippi.pojo.common.PlayerActionState;
 import matsu.jippi.pojo.common.PlayerIndexedType;
 import matsu.jippi.pojo.common.PostFrameUpdateType;
 
-public class ActionsComputer {
+public class ActionsComputer implements StatComputer<List<ActionCountsType>> {
     private final List<State> dashDanceAnimations = new ArrayList<>(Arrays.asList(State.DASH, State.TURN, State.DASH));
     private List<PlayerIndexedType> playerPermutations = new ArrayList<>();
     private Map<PlayerIndexedType, PlayerActionState> state = new HashMap<>();
@@ -29,7 +30,7 @@ public class ActionsComputer {
         });
     }
 
-    public void processFrame(FrameEntryType frame) {
+    public void processFrame(FrameEntryType frame, FramesType allFrames) {
         playerPermutations.forEach((indices) -> {
             PlayerActionState currentState = state.get(indices);
             handleActionCompute(currentState, indices, frame);
