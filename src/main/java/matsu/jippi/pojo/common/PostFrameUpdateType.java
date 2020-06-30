@@ -113,6 +113,10 @@ public class PostFrameUpdateType implements EventPayloadTypes {
         return percent;
     }
 
+    public int getPercentOrZero() {
+        return percent == null ? 0 : percent;
+    }
+
     public void setPercent(Integer percent) {
         this.percent = percent;
     }

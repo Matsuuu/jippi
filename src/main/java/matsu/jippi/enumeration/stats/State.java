@@ -19,4 +19,13 @@ public enum State {
         this.hex = hex;
     }
 
+    public static State from(int animation) {
+        for (State s : State.values()) {
+            if (s.getHex() == animation) {
+                return s;
+            }
+        }
+        return null;
+    }
+
 }

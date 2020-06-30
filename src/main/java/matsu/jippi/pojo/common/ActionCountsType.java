@@ -1,6 +1,7 @@
 package matsu.jippi.pojo.common;
 
 public class ActionCountsType {
+    private PlayerIndexedType playerIndexedType;
     private int wavedashCount;
     private int wavelandCount;
     private int airDodgeCount;
@@ -11,6 +12,14 @@ public class ActionCountsType {
 
     public int getWavedashCount() {
         return wavedashCount;
+    }
+
+    public PlayerIndexedType getPlayerIndexedType() {
+        return playerIndexedType;
+    }
+
+    public void setPlayerIndexedType(PlayerIndexedType playerIndexedType) {
+        this.playerIndexedType = playerIndexedType;
     }
 
     public void setWavedashCount(int wavedashCount) {
@@ -65,8 +74,9 @@ public class ActionCountsType {
         this.rollCount = rollCount;
     }
 
-    public ActionCountsType(int wavedashCount, int wavelandCount, int airDodgeCount, int dashDanceCount,
-            int spotDodgeCount, int ledgegrabCount, int rollCount) {
+    public ActionCountsType(PlayerIndexedType playerIndexedType, int wavedashCount, int wavelandCount,
+            int airDodgeCount, int dashDanceCount, int spotDodgeCount, int ledgegrabCount, int rollCount) {
+        this.playerIndexedType = playerIndexedType;
         this.wavedashCount = wavedashCount;
         this.wavelandCount = wavelandCount;
         this.airDodgeCount = airDodgeCount;
