@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import matsu.jippi.enumeration.slpreader.Command;
+import matsu.jippi.enumeration.slpreader.SlpInputSource;
 import matsu.jippi.interfaces.EventCallbackFunc;
 import matsu.jippi.interfaces.EventPayloadTypes;
 import matsu.jippi.interfaces.SlpRefType;
@@ -17,6 +18,7 @@ import matsu.jippi.pojo.common.FrameBookendType;
 import matsu.jippi.pojo.common.GameEndType;
 import matsu.jippi.pojo.common.GameStartType;
 import matsu.jippi.pojo.common.ItemUpdateType;
+import matsu.jippi.pojo.common.MetadataType;
 import matsu.jippi.pojo.common.PlayerType;
 import matsu.jippi.pojo.common.PostFrameUpdateType;
 import matsu.jippi.pojo.common.PreFrameUpdateType;
@@ -32,8 +34,7 @@ public class SlpReader {
             case BUFFER:
                 return new SlpBufferSourceRef(input.getSource(), input.getBuffer());
             case FILE:
-                return new SlpFileSourceRef(input.getSource(),
-                        Integer.parseInt(FileReader.readFileFromPath(input.getFilePath())));
+                return new SlpFileSourceRef(input.getSource(), FileReader.readFileFromPath(input.getFilePath()));
             default:
                 throw new IOException("Source type not supported");
         }
@@ -42,12 +43,15 @@ public class SlpReader {
     public int readRef(SlpRefType ref, ByteBuffer buffer, int offset, int length, int position) throws IOException {
         switch (ref.getSource()) {
             case BUFFER:
-                buffer = ((SlpBufferSourceRef) ref).getBuffer().duplicate();
-                return buffer.getInt();
+                return 0;
             case FILE:
-                buffer = ByteBuffer.wrap(FileReader
-                        .readFileFromPath(Integer.toString(((SlpFileSourceRef) ref).getFileDescriptor())).getBytes());
-                return buffer.getInt();
+                System.out.println("Reading input from " + position + " to " + (position + length) + " and setting it to offset " + offset);
+                SlpFileSourceRef fileSourceRef = (SlpFileSourceRef) ref;
+
+                ByteBuffer bytes = ByteBuffer.allocate(length);
+                fileSourceRef.getFileInputStream().getChannel().read(bytes, position);
+                buffer.put(bytes.array(), offset, length);
+                return buffer.position();
             default:
                 throw new IOException("Source type not supported");
 
@@ -59,7 +63,7 @@ public class SlpReader {
             case BUFFER:
                 return ((SlpBufferSourceRef) ref).getBuffer().position();
             case FILE:
-                return ((SlpFileSourceRef) ref).getFileDescriptor();
+                return (int) ((SlpFileSourceRef) ref).getFileInputStream().getChannel().size();
             default:
                 throw new IOException("Source type not supported");
 
@@ -76,6 +80,15 @@ public class SlpReader {
         Map<Integer, Integer> messageSizes = getMessageSizes(ref, rawDataPosition);
 
         return new SlpFileType(ref, rawDataPosition, rawDataLength, metadataPosition, metadataLength, messageSizes);
+    }
+
+    public void closeSlpFile(SlpFileType file) throws IOException {
+        switch (file.getRef().getSource()) {
+            case FILE:
+                SlpFileSourceRef sourceRef = (SlpFileSourceRef) file.getRef();
+                sourceRef.getFileInputStream().close();
+                break;
+        }
     }
 
     private int getRawDataPosition(SlpRefType ref) throws IOException {
@@ -101,6 +114,10 @@ public class SlpReader {
 
         ByteBuffer buffer = ByteBuffer.allocate(4);
         readRef(ref, buffer, 0, buffer.capacity(), position - 4);
+        System.out.println(buffer.get(0));
+        System.out.println(buffer.get(1));
+        System.out.println(buffer.get(2));
+        System.out.println(buffer.get(3));
 
         int rawDataLength = buffer.get(0) << 24 | buffer.get(1) << 16 | buffer.get(2) << 8 | buffer.get(3);
         if (rawDataLength > 0) {
@@ -135,9 +152,9 @@ public class SlpReader {
 
         ByteBuffer messageSizesBuffer = ByteBuffer.allocate(payloadLength - 1);
         readRef(ref, messageSizesBuffer, 0, messageSizesBuffer.capacity(), position + 2);
-        for (int i = 0; i < payloadLength; i += 3) {
-            int command = messageSizesBuffer.get(i);
-            messageSizes.put(command, messageSizesBuffer.get(i + 1) << 8 | messageSizesBuffer.get(i + 2));
+        for (int i = 0; i < payloadLength - 1; i += 3) {
+                int command = messageSizesBuffer.get(i);
+                messageSizes.put(command, messageSizesBuffer.get(i + 1) << 8 | messageSizesBuffer.get(i + 2));
         }
         return messageSizes;
     }
@@ -157,6 +174,7 @@ public class SlpReader {
         while (readPosition < stopReadingAt) {
             readRef(ref, commandByteBuffer, 0, 1, readPosition);
             int commandByte = commandByteBuffer.get(0);
+            Command commandFromByte = Command.from(commandByte);
             if (!commandPayloadBuffers.containsKey(commandByte)) {
                 return readPosition;
             }
@@ -167,7 +185,14 @@ public class SlpReader {
             }
 
             readRef(ref, buffer, 0, buffer.capacity(), readPosition);
-            // Parsemessage
+            EventPayloadTypes parsedPayload = parseMessage(commandFromByte, buffer);
+            boolean shouldStop = callback.callback(commandFromByte, parsedPayload);
+
+            if (shouldStop) {
+                break;
+            }
+            commandByteBuffer.clear();
+            readPosition += buffer.capacity();
         }
 
         return 1;
@@ -189,10 +214,6 @@ public class SlpReader {
                         cfOption = "Dween";
                     }
 
-                    int nametagOffset = playerIndex * 0x10;
-                    int nametagStart = 0x161 + nametagOffset;
-                    ByteBuffer nametagBuf = ByteBuffer
-                            .wrap(Arrays.copyOfRange(payload.array(), nametagStart, nametagStart + 16));
                     String nameTag = "";
                     int offset = playerIndex * 0x24;
 
@@ -225,5 +246,18 @@ public class SlpReader {
                 return new GameEndType(payload.getInt(0x1), payload.getInt(0x2));
         }
         return null;
+    }
+
+    public MetadataType getMetadata(SlpFileType slpFile) throws IOException {
+        if (slpFile.getMetadataLength() <= 0) {
+            return null;
+        }
+        ByteBuffer buffer = ByteBuffer.allocate(slpFile.getMetadataLength());
+        readRef(slpFile.getRef(), buffer, 0, buffer.capacity(), slpFile.getMetadataPosition());
+
+        MetadataType metadata = null;
+        // TODO: Figure our the decode
+        //
+        return metadata;
     }
 }

@@ -1,16 +1,25 @@
 package matsu.jippi.util;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class FileReader {
-    public static String readFileFromPath(String filePath) {
+    public static FileInputStream readFileFromPath(String filePath) {
         try {
-            return Files.readString(Paths.get(filePath));
+            Path currentDir = Paths.get(".");
+            String currentDirPath = currentDir.toAbsolutePath().toString();
+            String fullPath = currentDirPath.substring(0, currentDirPath.length() - 2) + "/" + filePath;
+
+            File file = new File(fullPath);
+            FileInputStream fis = new FileInputStream(file);
+            return fis;
         } catch (IOException e) {
             e.printStackTrace();
-            return "NO_FILE_FOUND";
+            return null;
         }
     }
 }

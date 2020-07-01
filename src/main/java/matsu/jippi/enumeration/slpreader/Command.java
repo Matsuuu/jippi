@@ -13,4 +13,13 @@ public enum Command {
     public int getHex() {
         return hex;
     }
+
+    public static Command from(int hex) {
+        for (Command c : Command.values()) {
+            if (c.getHex() == hex) {
+                return c;
+            }
+        }
+        return null;
+    }
 }

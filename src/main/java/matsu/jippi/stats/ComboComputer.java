@@ -118,7 +118,7 @@ public class ComboComputer implements StatComputer<List<ComboType>> {
             shouldTerminate = true;
         }
 
-        if (comboState.getResetCounter() > Timers.COMBO_STRING_RESET_FRAMES) {
+        if (comboState.getResetCounter() > Timers.COMBO_STRING_RESET_FRAMES.getFrames()) {
             shouldTerminate = true;
         }
 

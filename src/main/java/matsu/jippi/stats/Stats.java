@@ -1,5 +1,6 @@
 package matsu.jippi.stats;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import matsu.jippi.enumeration.stats.Frames;
@@ -17,7 +18,7 @@ public class Stats {
     private Integer lastProcessedFrame = null;
     private FramesType frames;
     private List<PlayerIndexedType> playerPermutations;
-    private List<StatComputer<?>> allComputers;
+    private List<StatComputer<?>> allComputers = new ArrayList<>();
 
     public Stats(StatOptions options) {
         this.options = options == null ? defaultOptions : options;

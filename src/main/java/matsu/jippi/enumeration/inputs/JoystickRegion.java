@@ -6,7 +6,7 @@ public enum JoystickRegion {
     private int region;
 
     private JoystickRegion(int region) {
-        this.setRegion(region);
+        this.region = region;
     }
 
     public int getRegion() {
