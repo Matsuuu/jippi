@@ -1,9 +1,10 @@
 package matsu.jippi.pojo.common;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class FramesType {
-    private Map<Integer, FrameEntryType> frames;
+    private Map<Integer, FrameEntryType> frames = new HashMap<>();
 
     public FramesType() {
     }

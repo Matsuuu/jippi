@@ -54,11 +54,11 @@ public class ComboComputer implements StatComputer<List<ComboType>> {
 
         boolean opntIsDamaged = StatsQuerier.isDamaged(opponentFrame.getActionStateId());
         boolean opntIsGrabbed = StatsQuerier.isGrabbed(opponentFrame.getActionStateId());
-        Integer opntDamageTaken = StatsQuerier.calcDamageTaken(opponentFrame, prevOpponentFrame);
+        Float opntDamageTaken = StatsQuerier.calcDamageTaken(opponentFrame, prevOpponentFrame);
 
         boolean actionChangedSinceHit = playerFrame.getActionStateId() != comboState.getLastHitAnimation();
-        Integer actionCounter = playerFrame.getActionStateCounter();
-        Integer prevActionCounter = prevPlayerFrame.getActionStateCounter();
+        Float actionCounter = playerFrame.getActionStateCounter();
+        Float prevActionCounter = prevPlayerFrame.getActionStateCounter();
         boolean actionFrameCounterReset = actionCounter < prevActionCounter;
         if (actionChangedSinceHit || actionFrameCounterReset) {
             comboState.setLastHitAnimation(null);

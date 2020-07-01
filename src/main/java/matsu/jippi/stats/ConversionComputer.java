@@ -20,7 +20,7 @@ import matsu.jippi.pojo.common.PostFrameUpdateType;
 
 public class ConversionComputer implements StatComputer<List<ConversionType>> {
     private List<PlayerIndexedType> playerPermutations = new ArrayList<>();
-    private List<ConversionType> conversions;
+    private List<ConversionType> conversions = new ArrayList<>();
     private Map<PlayerIndexedType, PlayerConversionState> state = new HashMap<>();
     private ConversionMetadataType metadata;
 
@@ -93,11 +93,11 @@ public class ConversionComputer implements StatComputer<List<ConversionType>> {
 
         boolean opntIsDamaged = StatsQuerier.isDamaged(opponentFrame.getActionStateId());
         boolean opntIsGrabbed = StatsQuerier.isGrabbed(opponentFrame.getActionStateId());
-        Integer opntDamageTaken = StatsQuerier.calcDamageTaken(opponentFrame, prevOpponentFrame);
+        Float opntDamageTaken = StatsQuerier.calcDamageTaken(opponentFrame, prevOpponentFrame);
 
         boolean actionChangedSinceHit = playerFrame.getActionStateId() != conversionState.getLastHitAnimation();
-        Integer actionCounter = playerFrame.getActionStateCounter();
-        Integer prevActionCounter = prevPlayerFrame.getActionStateCounter();
+        Float actionCounter = playerFrame.getActionStateCounter();
+        Float prevActionCounter = prevPlayerFrame.getActionStateCounter();
         boolean actionFrameCounterReset = actionCounter < prevActionCounter;
         if (actionChangedSinceHit || actionFrameCounterReset) {
             conversionState.setLastHitAnimation(null);

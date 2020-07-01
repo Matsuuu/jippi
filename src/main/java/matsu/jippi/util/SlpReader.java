@@ -45,7 +45,6 @@ public class SlpReader {
             case BUFFER:
                 return 0;
             case FILE:
-                System.out.println("Reading input from " + position + " to " + (position + length) + " and setting it to offset " + offset);
                 SlpFileSourceRef fileSourceRef = (SlpFileSourceRef) ref;
 
                 ByteBuffer bytes = ByteBuffer.allocate(length);
@@ -114,10 +113,6 @@ public class SlpReader {
 
         ByteBuffer buffer = ByteBuffer.allocate(4);
         readRef(ref, buffer, 0, buffer.capacity(), position - 4);
-        System.out.println(buffer.get(0));
-        System.out.println(buffer.get(1));
-        System.out.println(buffer.get(2));
-        System.out.println(buffer.get(3));
 
         int rawDataLength = buffer.get(0) << 24 | buffer.get(1) << 16 | buffer.get(2) << 8 | buffer.get(3);
         if (rawDataLength > 0) {
@@ -153,8 +148,8 @@ public class SlpReader {
         ByteBuffer messageSizesBuffer = ByteBuffer.allocate(payloadLength - 1);
         readRef(ref, messageSizesBuffer, 0, messageSizesBuffer.capacity(), position + 2);
         for (int i = 0; i < payloadLength - 1; i += 3) {
-                int command = messageSizesBuffer.get(i);
-                messageSizes.put(command, messageSizesBuffer.get(i + 1) << 8 | messageSizesBuffer.get(i + 2));
+            int command = messageSizesBuffer.get(i);
+            messageSizes.put(command, messageSizesBuffer.get(i + 1) << 8 | messageSizesBuffer.get(i + 2));
         }
         return messageSizes;
     }
@@ -184,6 +179,7 @@ public class SlpReader {
                 return readPosition;
             }
 
+            buffer.clear();
             readRef(ref, buffer, 0, buffer.capacity(), readPosition);
             EventPayloadTypes parsedPayload = parseMessage(commandFromByte, buffer);
             boolean shouldStop = callback.callback(commandFromByte, parsedPayload);
@@ -203,47 +199,51 @@ public class SlpReader {
             case GAME_START:
                 List<PlayerType> players = new ArrayList<>(Arrays.asList(0, 1, 2, 3)).stream().map(playerIndex -> {
                     int cfOffset = playerIndex * 0x8;
-                    int dashback = payload.get(0x141 + cfOffset);
-                    int shieldDrop = payload.get(0x145 + cfOffset);
+                    Integer dashback = readInt32(payload, 0x141 + cfOffset);
+                    Integer shieldDrop = readInt32(payload, 0x145 + cfOffset);
                     String cfOption = "None";
                     if (dashback != shieldDrop) {
                         cfOption = "Mixed";
-                    } else if (dashback == 1) {
+                    } else if (dashback != null && dashback == 1) {
                         cfOption = "UCF";
-                    } else if (dashback == 2) {
+                    } else if (dashback != null && dashback == 2) {
                         cfOption = "Dween";
                     }
 
                     String nameTag = "";
                     int offset = playerIndex * 0x24;
 
-                    return new PlayerType(playerIndex, playerIndex + 1, payload.getInt(0x65 + offset),
-                            payload.getInt(0x68 + offset), payload.getInt(0x67 + offset), payload.getInt(0x66 + offset),
-                            payload.getInt(0x6E + offset), cfOption, nameTag);
+                    return new PlayerType(playerIndex, playerIndex + 1, readUInt8(payload, 0x65 + offset),
+                            readUInt8(payload, 0x68 + offset), readUInt8(payload, 0x67 + offset),
+                            readUInt8(payload, 0x66 + offset), readUInt8(payload, 0x6E + offset), cfOption, nameTag);
                 }).collect(Collectors.toCollection(ArrayList::new));
 
-                return new GameStartType(payload.getInt(0x1) + "." + payload.getInt(0x2) + "." + payload.getInt(0x3),
-                        payload.getInt(0xD) == 1, payload.getInt(0x1A1) == 1, payload.getInt(0x13), players);
+                return new GameStartType(
+                        readUInt8(payload, 0x1) + "." + readUInt8(payload, 0x2) + "." + readUInt8(payload, 0x3),
+                        readBool(payload, 0xD), readBool(payload, 0x1A1), readUInt16(payload, 0x14), players);
             case PRE_FRAME_UPDATE:
-                return new PreFrameUpdateType(payload.getInt(0x1), payload.getInt(0x5), payload.getInt(0x6) == 1,
-                        payload.getInt(0x7), payload.getInt(0xB), payload.getInt(0xD), payload.getInt(0x11),
-                        payload.getInt(0x15), payload.getInt(0x19), payload.getInt(0x1D), payload.getInt(0x21),
-                        payload.getInt(0x25), payload.getInt(0x29), payload.getInt(0x2D), payload.getInt(0x31),
-                        payload.getInt(0x33), payload.getInt(0x37), payload.getInt(0x3C));
+                return new PreFrameUpdateType(readInt32(payload, 0x1), readUInt8(payload, 0x5), readBool(payload, 0x6),
+                        readUInt32(payload, 0x7), readUInt16(payload, 0xB), readFloat(payload, 0xD),
+                        readFloat(payload, 0x11), readFloat(payload, 0x15), readFloat(payload, 0x19),
+                        readFloat(payload, 0x1D), readFloat(payload, 0x21), readFloat(payload, 0x25),
+                        readFloat(payload, 0x29), readUInt32(payload, 0x2D), readUInt16(payload, 0x31),
+                        readFloat(payload, 0x33), readFloat(payload, 0x37), readFloat(payload, 0x3C));
             case POST_FRAME_UPDATE:
-                return new PostFrameUpdateType(payload.getInt(0x1), payload.getInt(0x5), payload.get(0x6) == 1,
-                        payload.getInt(0x7), payload.getInt(0x8), payload.getFloat(0xA), payload.getFloat(0xE),
-                        payload.getInt(0x12), payload.getInt(0x16), payload.getFloat(0x1A), payload.getInt(0x1E),
-                        payload.getInt(0x1F), payload.getInt(0x20), payload.getInt(0x21), payload.getInt(0x22),
-                        payload.getInt(0x33));
+                return new PostFrameUpdateType(readInt32(payload, 0x1), readUInt8(payload, 0x5), readBool(payload, 0x6),
+                        readUInt8(payload, 0x7), readUInt16(payload, 0x8), readFloat(payload, 0xA),
+                        readFloat(payload, 0xE), readFloat(payload, 0x12), readFloat(payload, 0x16),
+                        readFloat(payload, 0x1A), readUInt8(payload, 0x1E), readUInt8(payload, 0x1F),
+                        readUInt8(payload, 0x20), readUInt8(payload, 0x21), readFloat(payload, 0x22),
+                        readUInt8(payload, 0x33));
             case ITEM_UPDATE:
-                return new ItemUpdateType(payload.getInt(0x1), payload.getInt(0x5), payload.getInt(0x7),
-                        payload.getFloat(0x8), payload.getFloat(0xC), payload.getFloat(0x10), payload.getFloat(0x14),
-                        payload.getFloat(0x18), payload.getFloat(0x1C), payload.getFloat(0x1E), payload.getInt(0x20));
+                return new ItemUpdateType(readInt32(payload, 0x1), readUInt16(payload, 0x5), readUInt8(payload, 0x7),
+                        readFloat(payload, 0x8), readFloat(payload, 0xC), readFloat(payload, 0x10),
+                        readFloat(payload, 0x14), readFloat(payload, 0x18), readUInt16(payload, 0x1C),
+                        readUInt16(payload, 0x1E), readUInt32(payload, 0x20));
             case FRAME_BOOKEND:
-                return new FrameBookendType(payload.getInt(0x1));
+                return new FrameBookendType(readUInt32(payload, 0x1));
             case GAME_END:
-                return new GameEndType(payload.getInt(0x1), payload.getInt(0x2));
+                return new GameEndType(readUInt8(payload, 0x1), readInt8(payload, 0x2));
         }
         return null;
     }
@@ -256,8 +256,45 @@ public class SlpReader {
         readRef(slpFile.getRef(), buffer, 0, buffer.capacity(), slpFile.getMetadataPosition());
 
         MetadataType metadata = null;
-        // TODO: Figure our the decode
+        // TODO: Figure out the decode
         //
         return metadata;
+    }
+
+    boolean canReadFromPayload(ByteBuffer payload, int offset, int length) {
+        int payloadLength = payload.capacity();
+        return offset + length <= payloadLength;
+    }
+
+    Float readFloat(ByteBuffer payload, int offset) {
+        return canReadFromPayload(payload, offset, 4) ? payload.getFloat(offset) : null;
+    }
+
+    Integer readInt32(ByteBuffer payload, int offset) {
+        return canReadFromPayload(payload, offset, 4) ? payload.getInt(offset) : null;
+    }
+
+    Integer readInt8(ByteBuffer payload, int offset) {
+        return canReadFromPayload(payload, offset, 4) ? payload.getInt(offset) : null;
+    }
+
+    Integer readInt16(ByteBuffer payload, int offset) {
+        return canReadFromPayload(payload, offset, 2) ? payload.getInt(offset) : null;
+    }
+
+    Integer readUInt32(ByteBuffer payload, int offset) {
+        return canReadFromPayload(payload, offset, 4) ? Byte.toUnsignedInt(payload.get(offset)) : null;
+    }
+
+    Integer readUInt8(ByteBuffer payload, int offset) {
+        return canReadFromPayload(payload, offset, 1) ? Byte.toUnsignedInt(payload.get(offset)) : null;
+    }
+
+    Integer readUInt16(ByteBuffer payload, int offset) {
+        return canReadFromPayload(payload, offset, 2) ? Byte.toUnsignedInt(payload.get(offset)) : null;
+    }
+
+    boolean readBool(ByteBuffer payload, int offset) {
+        return canReadFromPayload(payload, offset, 1) ? payload.getInt(offset) == 1 : false;
     }
 }

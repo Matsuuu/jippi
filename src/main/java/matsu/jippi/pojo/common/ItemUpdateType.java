@@ -11,15 +11,15 @@ public class ItemUpdateType implements EventPayloadTypes {
     private Float velocityY;
     private Float positionX;
     private Float positionY;
-    private Float damageTaken;
-    private Float expirationTimer;
+    private Integer damageTaken;
+    private Integer expirationTimer;
     private Integer spawnId;
 
     public ItemUpdateType() {
     }
 
     public ItemUpdateType(Integer frame, Integer typeId, Integer state, Float facingDirection, Float velocityX,
-            Float velocityY, Float positionX, Float positionY, Float damageTaken, Float expirationTimer,
+            Float velocityY, Float positionX, Float positionY, Integer damageTaken, Integer expirationTimer,
             Integer spawnId) {
         this.frame = frame;
         this.typeId = typeId;
@@ -98,19 +98,19 @@ public class ItemUpdateType implements EventPayloadTypes {
         this.positionY = positionY;
     }
 
-    public Float getDamageTaken() {
+    public Integer getDamageTaken() {
         return damageTaken;
     }
 
-    public void setDamageTaken(Float damageTaken) {
+    public void setDamageTaken(Integer damageTaken) {
         this.damageTaken = damageTaken;
     }
 
-    public Float getExpirationTimer() {
+    public Integer getExpirationTimer() {
         return expirationTimer;
     }
 
-    public void setExpirationTimer(Float expirationTimer) {
+    public void setExpirationTimer(Integer expirationTimer) {
         this.expirationTimer = expirationTimer;
     }
 
@@ -121,5 +121,4 @@ public class ItemUpdateType implements EventPayloadTypes {
     public void setSpawnId(Integer spawnId) {
         this.spawnId = spawnId;
     }
-
 }

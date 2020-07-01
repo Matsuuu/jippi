@@ -1,37 +1,38 @@
 package matsu.jippi.pojo.common;
 
 public class DamageType {
-    private int startPercent;
-    private int currentPercent;
-    private Integer endPercent;
+    private float startPercent;
+    private float currentPercent;
+    private Float endPercent;
 
-    public int getStartPercent() {
+    public DamageType(float startPercent, float currentPercent, Float endPercent) {
+        this.startPercent = startPercent;
+        this.currentPercent = currentPercent;
+        this.endPercent = endPercent;
+    }
+
+    public float getStartPercent() {
         return startPercent;
     }
 
-    public void setStartPercent(int startPercent) {
+    public void setStartPercent(float startPercent) {
         this.startPercent = startPercent;
     }
 
-    public int getCurrentPercent() {
+    public float getCurrentPercent() {
         return currentPercent;
     }
 
-    public void setCurrentPercent(int currentPercent) {
+    public void setCurrentPercent(float currentPercent) {
         this.currentPercent = currentPercent;
     }
 
-    public Integer getEndPercent() {
+    public Float getEndPercent() {
         return endPercent;
     }
 
-    public void setEndPercent(Integer endPercent) {
+    public void setEndPercent(Float endPercent) {
         this.endPercent = endPercent;
     }
 
-    public DamageType(int startPercent, int currentPercent, Integer endPercent) {
-        this.startPercent = startPercent;
-        this.currentPercent = currentPercent;
-        this.endPercent = endPercent;
-    }
 }

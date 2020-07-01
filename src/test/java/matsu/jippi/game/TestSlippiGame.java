@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import matsu.jippi.enumeration.melee.Stages;
 import matsu.jippi.pojo.common.GameStartType;
+import matsu.jippi.pojo.common.StatsType;
 
 public class TestSlippiGame {
 
@@ -18,7 +19,16 @@ public class TestSlippiGame {
         SlippiGame game = new SlippiGame("slp/sheik_vs_ics_yoshis.slp");
         GameStartType settings = game.getSettings();
 
-        assertEquals(settings.getStageId(), Integer.valueOf(Stages.YOSHIS_STORY.getStage().getId()));
+        assertEquals(Integer.valueOf(Stages.YOSHIS_STORY.getStage().getId()), settings.getStageId());
+    }
+
+    @Test
+    public void testStats() throws IOException {
+        SlippiGame game = new SlippiGame("slp/test.slp");
+        StatsType stats = game.getStats();
+
+        assertEquals(stats.getStocks().size(), 5);
+        assertEquals(stats.getLastFrame(), 3694);
     }
 
 }

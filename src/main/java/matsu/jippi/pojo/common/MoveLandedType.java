@@ -4,7 +4,7 @@ public class MoveLandedType {
     private int frame;
     private int moveId;
     private int hitCount;
-    private int damage;
+    private float damage;
 
     public int getFrame() {
         return frame;
@@ -30,18 +30,19 @@ public class MoveLandedType {
         this.hitCount = hitCount;
     }
 
-    public int getDamage() {
+    public float getDamage() {
         return damage;
     }
 
-    public void setDamage(int damage) {
+    public void setDamage(float damage) {
         this.damage = damage;
     }
 
-    public MoveLandedType(int frame, int moveId, int hitCount, int damage) {
+    public MoveLandedType(int frame, int moveId, int hitCount, float damage) {
         this.frame = frame;
         this.moveId = moveId;
         this.hitCount = hitCount;
         this.damage = damage;
     }
+
 }

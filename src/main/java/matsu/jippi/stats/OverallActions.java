@@ -32,11 +32,19 @@ public class OverallActions {
 
             int inputCount = inputsByPlayer.get(playerIndexType.getPlayerIndex()).size();
             List<ConversionType> playerConversions = conversionsByPlayer.get(playerIndexType.getPlayerIndex());
+            if (playerConversions == null) {
+                playerConversions = new ArrayList<>();
+            }
             List<ConversionType> successfulConversions = playerConversions.stream()
                     .filter(con -> con.getMoves().size() > 1).collect(Collectors.toList());
+
             List<StockType> opponentStocks = stocksByPlayer.get(playerIndexType.getOpponentIndex());
+            if (opponentStocks == null) {
+                opponentStocks = new ArrayList<>();
+            }
             List<StockType> opponentEndedStocks = opponentStocks.stream()
                     .filter(sto -> sto.getDurationType().getEndFrame() != null).collect(Collectors.toList());
+
             int totalDamage = getTotalDamage(opponentStocks);
 
             int conversionCount = playerConversions.size();
@@ -58,17 +66,22 @@ public class OverallActions {
     }
 
     private static RatioType getRatio(int count, Integer total) {
-        return new RatioType(count, total, total != null ? count / total : null);
+        return new RatioType(count, total, total != null && total != 0 ? count / total : null);
     }
 
     private static RatioType getOpeningRatio(ConversionByPlayerByOpening conversionsByPlayerByOpening, int playerIndex,
             int opponentIndex, String type) {
 
-        List<ConversionType> openings = conversionsByPlayerByOpening.getConversion().get(Integer.toString(playerIndex))
-                .get(type);
+        Map<String, Map<String, List<ConversionType>>> conversion = conversionsByPlayerByOpening.getConversion();
+        String playerIndexAsString = Integer.toString(playerIndex);
+        String opponentIndexAsString = Integer.toString(opponentIndex);
 
-        List<ConversionType> opponentOpenings = conversionsByPlayerByOpening.getConversion()
-                .get(Integer.toString(opponentIndex)).get(type);
+        List<ConversionType> openings = conversion.get(playerIndexAsString) != null
+                ? conversion.get(playerIndexAsString).get(type)
+                : new ArrayList<>();
+        List<ConversionType> opponentOpenings = conversion.get(opponentIndexAsString) != null
+                ? conversion.get(opponentIndexAsString).get(type)
+                : new ArrayList<>();
 
         return getRatio(openings.size(), openings.size() + opponentOpenings.size());
     }
@@ -76,19 +89,25 @@ public class OverallActions {
     private static RatioType getBeneficialTradeatio(ConversionByPlayerByOpening conversionsByPlayerByOpening,
             int playerIndex, int opponentIndex) {
 
-        List<ConversionType> playerTrades = conversionsByPlayerByOpening.getConversion()
-                .get(Integer.toString(playerIndex)).get("trade");
-        List<ConversionType> opponentTrades = conversionsByPlayerByOpening.getConversion()
-                .get(Integer.toString(opponentIndex)).get("trade");
+        String playerIndexAsString = Integer.toString(playerIndex);
+        String opponentIndexAsString = Integer.toString(opponentIndex);
+        Map<String, Map<String, List<ConversionType>>> conversion = conversionsByPlayerByOpening.getConversion();
+
+        List<ConversionType> playerTrades = conversion.get(playerIndexAsString) != null
+                ? conversion.get(playerIndexAsString).get("trade")
+                : new ArrayList<>();
+        List<ConversionType> opponentTrades = conversion.get(opponentIndexAsString) != null
+                ? conversion.get(opponentIndexAsString).get("trade")
+                : new ArrayList<>();
 
         List<ConversionType> benefitsPlayer = new ArrayList<>();
         for (int i = 0; i < playerTrades.size(); i++) {
             ConversionType playerConversion = playerTrades.get(i);
             ConversionType opponentConversion = opponentTrades.get(i);
 
-            int playerDamage = playerConversion.getDamageType().getCurrentPercent()
+            float playerDamage = playerConversion.getDamageType().getCurrentPercent()
                     - playerConversion.getDamageType().getStartPercent();
-            int opponentDamage = opponentConversion.getDamageType().getCurrentPercent()
+            float opponentDamage = opponentConversion.getDamageType().getCurrentPercent()
                     - opponentConversion.getDamageType().getStartPercent();
 
             if (playerConversion.isDidKill() && !opponentConversion.isDidKill()) {

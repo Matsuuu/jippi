@@ -16,7 +16,7 @@ public class Stats {
 
     private StatOptions options;
     private Integer lastProcessedFrame = null;
-    private FramesType frames;
+    private FramesType frames = new FramesType();;
     private List<PlayerIndexedType> playerPermutations;
     private List<StatComputer<?>> allComputers = new ArrayList<>();
 

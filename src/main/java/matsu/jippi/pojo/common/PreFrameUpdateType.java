@@ -8,45 +8,21 @@ public class PreFrameUpdateType implements EventPayloadTypes {
     private boolean isFollower;
     private Integer seed;
     private Integer actionStateId;
-    private Integer positionX;
-    private Integer positionY;
-    private Integer facingDirection;
-    private Integer joystickX;
-    private Integer joystickY;
-    private Integer cStickX;
-    private Integer cStickY;
-    private Integer trigger;
+    private Float positionX;
+    private Float positionY;
+    private Float facingDirection;
+    private Float joystickX;
+    private Float joystickY;
+    private Float cStickX;
+    private Float cStickY;
+    private Float trigger;
     private Integer buttons;
     private Integer physicalButtons;
-    private Integer physicalLTrigger;
-    private Integer physicalRTrigger;
-    private Integer percent;
+    private Float physicalLTrigger;
+    private Float physicalRTrigger;
+    private Float percent;
 
     public PreFrameUpdateType() {
-    }
-
-    public PreFrameUpdateType(Integer frame, Integer playerIndex, boolean isFollower, Integer seed,
-            Integer actionStateId, Integer positionX, Integer positionY, Integer facingDirection, Integer joystickX,
-            Integer joystickY, Integer cStickX, Integer cStickY, Integer trigger, Integer buttons,
-            Integer physicalButtons, Integer physicalLTrigger, Integer physicalRTrigger, Integer percent) {
-        this.frame = frame;
-        this.playerIndex = playerIndex;
-        this.isFollower = isFollower;
-        this.seed = seed;
-        this.actionStateId = actionStateId;
-        this.positionX = positionX;
-        this.positionY = positionY;
-        this.facingDirection = facingDirection;
-        this.joystickX = joystickX;
-        this.joystickY = joystickY;
-        this.cStickX = cStickX;
-        this.cStickY = cStickY;
-        this.trigger = trigger;
-        this.buttons = buttons;
-        this.physicalButtons = physicalButtons;
-        this.physicalLTrigger = physicalLTrigger;
-        this.physicalRTrigger = physicalRTrigger;
-        this.percent = percent;
     }
 
     public Integer getFrame() {
@@ -89,67 +65,67 @@ public class PreFrameUpdateType implements EventPayloadTypes {
         this.actionStateId = actionStateId;
     }
 
-    public Integer getPositionX() {
+    public Float getPositionX() {
         return positionX;
     }
 
-    public void setPositionX(Integer positionX) {
+    public void setPositionX(Float positionX) {
         this.positionX = positionX;
     }
 
-    public Integer getPositionY() {
+    public Float getPositionY() {
         return positionY;
     }
 
-    public void setPositionY(Integer positionY) {
+    public void setPositionY(Float positionY) {
         this.positionY = positionY;
     }
 
-    public Integer getFacingDirection() {
+    public Float getFacingDirection() {
         return facingDirection;
     }
 
-    public void setFacingDirection(Integer facingDirection) {
+    public void setFacingDirection(Float facingDirection) {
         this.facingDirection = facingDirection;
     }
 
-    public Integer getJoystickX() {
+    public Float getJoystickX() {
         return joystickX;
     }
 
-    public void setJoystickX(Integer joystickX) {
+    public void setJoystickX(Float joystickX) {
         this.joystickX = joystickX;
     }
 
-    public Integer getJoystickY() {
+    public Float getJoystickY() {
         return joystickY;
     }
 
-    public void setJoystickY(Integer joystickY) {
+    public void setJoystickY(Float joystickY) {
         this.joystickY = joystickY;
     }
 
-    public Integer getcStickX() {
+    public Float getcStickX() {
         return cStickX;
     }
 
-    public void setcStickX(Integer cStickX) {
+    public void setcStickX(Float cStickX) {
         this.cStickX = cStickX;
     }
 
-    public Integer getcStickY() {
+    public Float getcStickY() {
         return cStickY;
     }
 
-    public void setcStickY(Integer cStickY) {
+    public void setcStickY(Float cStickY) {
         this.cStickY = cStickY;
     }
 
-    public Integer getTrigger() {
+    public Float getTrigger() {
         return trigger;
     }
 
-    public void setTrigger(Integer trigger) {
+    public void setTrigger(Float trigger) {
         this.trigger = trigger;
     }
 
@@ -169,27 +145,56 @@ public class PreFrameUpdateType implements EventPayloadTypes {
         this.physicalButtons = physicalButtons;
     }
 
-    public Integer getPhysicalLTrigger() {
+    public Float getPhysicalLTrigger() {
         return physicalLTrigger;
     }
 
-    public void setPhysicalLTrigger(Integer physicalLTrigger) {
+    public void setPhysicalLTrigger(Float physicalLTrigger) {
         this.physicalLTrigger = physicalLTrigger;
     }
 
-    public Integer getPhysicalRTrigger() {
+    public Float getPhysicalRTrigger() {
         return physicalRTrigger;
     }
 
-    public void setPhysicalRTrigger(Integer physicalRTrigger) {
+    public void setPhysicalRTrigger(Float physicalRTrigger) {
         this.physicalRTrigger = physicalRTrigger;
     }
 
-    public Integer getPercent() {
+    public Float getPercent() {
         return percent;
     }
 
-    public void setPercent(Integer percent) {
+    public Float getPercentOrZero() {
+        return percent == null ? 0 : percent;
+    }
+
+    public void setPercent(Float percent) {
         this.percent = percent;
     }
+
+    public PreFrameUpdateType(Integer frame, Integer playerIndex, boolean isFollower, Integer seed,
+            Integer actionStateId, Float positionX, Float positionY, Float facingDirection, Float joystickX,
+            Float joystickY, Float cStickX, Float cStickY, Float trigger, Integer buttons, Integer physicalButtons,
+            Float physicalLTrigger, Float physicalRTrigger, Float percent) {
+        this.frame = frame;
+        this.playerIndex = playerIndex;
+        this.isFollower = isFollower;
+        this.seed = seed;
+        this.actionStateId = actionStateId;
+        this.positionX = positionX;
+        this.positionY = positionY;
+        this.facingDirection = facingDirection;
+        this.joystickX = joystickX;
+        this.joystickY = joystickY;
+        this.cStickX = cStickX;
+        this.cStickY = cStickY;
+        this.trigger = trigger;
+        this.buttons = buttons;
+        this.physicalButtons = physicalButtons;
+        this.physicalLTrigger = physicalLTrigger;
+        this.physicalRTrigger = physicalRTrigger;
+        this.percent = percent;
+    }
+
 }

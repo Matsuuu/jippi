@@ -10,39 +10,17 @@ public class PostFrameUpdateType implements EventPayloadTypes {
     private Integer actionStateId;
     private Float positionX;
     private Float positionY;
-    private Integer facingDirection;
-    private Integer percent;
+    private Float facingDirection;
+    private Float percent;
     private Float shieldSize;
     private Integer lastAttackLanded;
     private Integer currentComboCount;
     private Integer lastHitBy;
     private Integer stocksRemaining;
-    private Integer actionStateCounter;
+    private Float actionStateCounter;
     private Integer lCancelStatus;
 
     public PostFrameUpdateType() {
-    }
-
-    public PostFrameUpdateType(Integer frame, Integer playerIndex, boolean isFollower, Integer internalCharacterId,
-            Integer actionStateId, Float positionX, Float positionY, Integer facingDirection, Integer percent,
-            Float shieldSize, Integer lastAttackLanded, Integer currentComboCount, Integer lastHitBy,
-            Integer stocksRemaining, Integer actionStateCounter, Integer lCancelStatus) {
-        this.frame = frame;
-        this.playerIndex = playerIndex;
-        this.isFollower = isFollower;
-        this.internalCharacterId = internalCharacterId;
-        this.actionStateId = actionStateId;
-        this.positionX = positionX;
-        this.positionY = positionY;
-        this.facingDirection = facingDirection;
-        this.percent = percent;
-        this.shieldSize = shieldSize;
-        this.lastAttackLanded = lastAttackLanded;
-        this.currentComboCount = currentComboCount;
-        this.lastHitBy = lastHitBy;
-        this.stocksRemaining = stocksRemaining;
-        this.actionStateCounter = actionStateCounter;
-        this.lCancelStatus = lCancelStatus;
     }
 
     public Integer getFrame() {
@@ -101,23 +79,23 @@ public class PostFrameUpdateType implements EventPayloadTypes {
         this.positionY = positionY;
     }
 
-    public Integer getFacingDirection() {
+    public Float getFacingDirection() {
         return facingDirection;
     }
 
-    public void setFacingDirection(Integer facingDirection) {
+    public void setFacingDirection(Float facingDirection) {
         this.facingDirection = facingDirection;
     }
 
-    public Integer getPercent() {
+    public Float getPercent() {
         return percent;
     }
 
-    public int getPercentOrZero() {
+    public Float getPercentOrZero() {
         return percent == null ? 0 : percent;
     }
 
-    public void setPercent(Integer percent) {
+    public void setPercent(Float percent) {
         this.percent = percent;
     }
 
@@ -161,11 +139,11 @@ public class PostFrameUpdateType implements EventPayloadTypes {
         this.stocksRemaining = stocksRemaining;
     }
 
-    public Integer getActionStateCounter() {
+    public Float getActionStateCounter() {
         return actionStateCounter;
     }
 
-    public void setActionStateCounter(Integer actionStateCounter) {
+    public void setActionStateCounter(Float actionStateCounter) {
         this.actionStateCounter = actionStateCounter;
     }
 
@@ -176,4 +154,27 @@ public class PostFrameUpdateType implements EventPayloadTypes {
     public void setlCancelStatus(Integer lCancelStatus) {
         this.lCancelStatus = lCancelStatus;
     }
+
+    public PostFrameUpdateType(Integer frame, Integer playerIndex, boolean isFollower, Integer internalCharacterId,
+            Integer actionStateId, Float positionX, Float positionY, Float facingDirection, Float percent,
+            Float shieldSize, Integer lastAttackLanded, Integer currentComboCount, Integer lastHitBy,
+            Integer stocksRemaining, Float actionStateCounter, Integer lCancelStatus) {
+        this.frame = frame;
+        this.playerIndex = playerIndex;
+        this.isFollower = isFollower;
+        this.internalCharacterId = internalCharacterId;
+        this.actionStateId = actionStateId;
+        this.positionX = positionX;
+        this.positionY = positionY;
+        this.facingDirection = facingDirection;
+        this.percent = percent;
+        this.shieldSize = shieldSize;
+        this.lastAttackLanded = lastAttackLanded;
+        this.currentComboCount = currentComboCount;
+        this.lastHitBy = lastHitBy;
+        this.stocksRemaining = stocksRemaining;
+        this.actionStateCounter = actionStateCounter;
+        this.lCancelStatus = lCancelStatus;
+    }
+
 }

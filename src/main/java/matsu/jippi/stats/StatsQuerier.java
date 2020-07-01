@@ -60,9 +60,9 @@ public class StatsQuerier {
         return state >= State.DYING_START.getHex() && state <= State.DYING_END.getHex();
     }
 
-    public static Integer calcDamageTaken(PostFrameUpdateType frame, PostFrameUpdateType prevFrame) {
-        int percent = frame.getPercent() != null ? frame.getPercent() : 0;
-        int prevPercent = prevFrame.getPercent() != null ? prevFrame.getPercent() : 0;
+    public static Float calcDamageTaken(PostFrameUpdateType frame, PostFrameUpdateType prevFrame) {
+        float percent = frame.getPercentOrZero();
+        float prevPercent = prevFrame.getPercentOrZero();
 
         return percent - prevPercent;
     }

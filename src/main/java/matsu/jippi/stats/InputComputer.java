@@ -79,7 +79,7 @@ public class InputComputer implements StatComputer<List<PlayerInput>> {
         return count;
     }
 
-    public JoystickRegion getJoystickRegion(int x, int y) {
+    public JoystickRegion getJoystickRegion(float x, float y) {
         JoystickRegion region = JoystickRegion.DZ;
 
         if (x >= 0.2875 && y >= 0.2875) {

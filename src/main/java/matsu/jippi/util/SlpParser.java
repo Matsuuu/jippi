@@ -25,7 +25,7 @@ import matsu.jippi.stats.StatsQuerier;
 
 public class SlpParser {
     private Stats statsComputer;
-    private FramesType frames;
+    private FramesType frames = new FramesType();
     private GameStartType settings;
     private GameEndType gameEnd;
     private Integer latestFrameIndex;
@@ -105,24 +105,35 @@ public class SlpParser {
     public void handleFrameUpdate(Command command, PreFrameUpdateType payload) {
         String field = payload.isFollower() ? "followers" : "players";
         latestFrameIndex = payload.getFrame();
+        if (!frames.getFrames().containsKey(payload.getFrame())) {
+            frames.getFrames().put(payload.getFrame(), new FrameEntryType());
+        }
 
         FrameEntryPlayerOrFollower playerOrFollower;
         if (field.equals("players")) {
             playerOrFollower = frames.getFrames().get(payload.getFrame()).getPlayers().get(payload.getPlayerIndex());
         } else {
             playerOrFollower = frames.getFrames().get(payload.getFrame()).getFollowers().get(payload.getPlayerIndex());
+        }
+        if (playerOrFollower == null) {
+            playerOrFollower = new FrameEntryPlayerOrFollower();
         }
         playerOrFollower.setPre(payload);
 
         GameStartType settings = getSettings();
         if (settings == null || settings.getSlpVersion().equals("2.2.0")) {
             statsComputer.addFrame(frames.getFrames().get(payload.getFrame()));
+        } else {
+            frames.getFrames().put(payload.getFrame(), new FrameEntryType());
         }
     }
 
     public void handleFrameUpdate(Command command, PostFrameUpdateType payload) {
         String field = payload.isFollower() ? "followers" : "players";
         latestFrameIndex = payload.getFrame();
+        if (!frames.getFrames().containsKey(payload.getFrame())) {
+            frames.getFrames().put(payload.getFrame(), new FrameEntryType());
+        }
 
         FrameEntryPlayerOrFollower playerOrFollower;
         if (field.equals("players")) {
@@ -130,11 +141,16 @@ public class SlpParser {
         } else {
             playerOrFollower = frames.getFrames().get(payload.getFrame()).getFollowers().get(payload.getPlayerIndex());
         }
+        if (playerOrFollower == null) {
+            playerOrFollower = new FrameEntryPlayerOrFollower();
+        }
         playerOrFollower.setPost(payload);
 
         GameStartType settings = getSettings();
         if (settings == null || settings.getSlpVersion().equals("2.2.0")) {
             statsComputer.addFrame(frames.getFrames().get(payload.getFrame()));
+        } else {
+            frames.getFrames().put(payload.getFrame(), new FrameEntryType());
         }
     }
 
