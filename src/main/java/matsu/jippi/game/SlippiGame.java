@@ -69,7 +69,7 @@ public class SlippiGame {
         parser = new SlpParser(statsComputer);
     }
 
-    private void process(boolean settingsOnly) throws IOException {
+    public void process(boolean settingsOnly) throws IOException {
         if (parser.getGameEnd() != null) {
             return;
         }

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+./build
+java -jar target/jippi-0.1.0-jar-with-dependencies.jar --file=slp/test.slp --output=analysis.json

@@ -43,7 +43,8 @@ public class SlpParser {
     }
 
     public int getPlayableFrameCount() {
-        if (latestFrameIndex == null) return 0;
+        if (latestFrameIndex == null)
+            return 0;
         return latestFrameIndex < Frames.FIRST_PLAYABLE.getFrame() ? 0
                 : latestFrameIndex - Frames.FIRST_PLAYABLE.getFrame();
     }
@@ -105,7 +106,8 @@ public class SlpParser {
         settingsComplete = payload.getFrame() > Frames.FIRST.getFrame();
     }
 
-    private FrameEntryPlayerOrFollower getFrameEntryPlayerOrFollower(FrameEntryType frameEntry, FrameUpdateType payload) {
+    private FrameEntryPlayerOrFollower getFrameEntryPlayerOrFollower(FrameEntryType frameEntry,
+            FrameUpdateType payload) {
         if (frameEntry == null) {
             return new FrameEntryPlayerOrFollower();
         }

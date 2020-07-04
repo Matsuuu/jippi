@@ -10,8 +10,7 @@ import java.nio.file.Paths;
 public class FileReader {
     public static FileInputStream readFileFromPath(String filePath) {
         try {
-            String fullPath = FileReader.getFullPath(filePath);
-            File file = new File(fullPath);
+            File file = new File(filePath);
             FileInputStream fis = new FileInputStream(file);
             return fis;
         } catch (IOException e) {

@@ -1,9 +1,13 @@
 package matsu.jippi;
 
+import java.io.IOException;
+
+import matsu.jippi.game.SlippiGame;
 import matsu.jippi.util.FileReader;
+import matsu.jippi.util.JSONWriter;
 
 public class App {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String replayFile = null;
         String outputFile = null;
         boolean isRealtime = false;
@@ -42,5 +46,15 @@ public class App {
         System.out.println("Realtime reading: " + isRealtime);
         System.out.println("");
         System.out.println("");
+        App.handleProcess(replayFile, outputFile, isRealtime);
+        System.out.println("Analysis complete");
+        System.out.println("");
+    }
+
+    private static void handleProcess(String replayFile, String outputFile, boolean isRealtime) throws IOException {
+        SlippiGame game = new SlippiGame(replayFile);
+        game.process(false);
+
+        JSONWriter.writeToJson(game, outputFile);
     }
 }
