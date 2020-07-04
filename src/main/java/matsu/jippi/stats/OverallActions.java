@@ -30,7 +30,7 @@ public class OverallActions {
         List<OverallType> overall = new ArrayList<>();
         for (PlayerIndexedType playerIndexType : playerIndices) {
 
-            int inputCount = inputsByPlayer.get(playerIndexType.getPlayerIndex()).size();
+            int inputCount = inputsByPlayer.get(playerIndexType.getPlayerIndex()).get(0).getInputCount();
             List<ConversionType> playerConversions = conversionsByPlayer.get(playerIndexType.getPlayerIndex());
             if (playerConversions == null) {
                 playerConversions = new ArrayList<>();
@@ -62,7 +62,7 @@ public class OverallActions {
                             playerIndexType.getOpponentIndex())));
         }
 
-        return null;
+        return overall;
     }
 
     private static RatioType getRatio(int count, Integer total) {
@@ -93,10 +93,10 @@ public class OverallActions {
         String opponentIndexAsString = Integer.toString(opponentIndex);
         Map<String, Map<String, List<ConversionType>>> conversion = conversionsByPlayerByOpening.getConversion();
 
-        List<ConversionType> playerTrades = conversion.get(playerIndexAsString) != null
+        List<ConversionType> playerTrades = conversion.containsKey(playerIndexAsString) && conversion.get(playerIndexAsString).containsKey("trade")
                 ? conversion.get(playerIndexAsString).get("trade")
                 : new ArrayList<>();
-        List<ConversionType> opponentTrades = conversion.get(opponentIndexAsString) != null
+        List<ConversionType> opponentTrades = conversion.containsKey(opponentIndexAsString) && conversion.get(opponentIndexAsString).containsKey("trade")
                 ? conversion.get(opponentIndexAsString).get("trade")
                 : new ArrayList<>();
 

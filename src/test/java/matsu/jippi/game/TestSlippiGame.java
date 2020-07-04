@@ -1,15 +1,19 @@
 package matsu.jippi.game;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
+import matsu.jippi.pojo.common.MetadataType;
 import org.junit.Test;
 
 import matsu.jippi.enumeration.melee.Stages;
+import matsu.jippi.pojo.common.ConversionType;
 import matsu.jippi.pojo.common.GameStartType;
 import matsu.jippi.pojo.common.StatsType;
+
+import static org.junit.Assert.*;
 
 public class TestSlippiGame {
 
@@ -19,16 +23,105 @@ public class TestSlippiGame {
         SlippiGame game = new SlippiGame("slp/sheik_vs_ics_yoshis.slp");
         GameStartType settings = game.getSettings();
 
-        assertEquals(Integer.valueOf(Stages.YOSHIS_STORY.getStage().getId()), settings.getStageId());
+        assertEquals("Stage is Yoshis", Integer.valueOf(Stages.YOSHIS_STORY.getStage().getId()), settings.getStageId());
     }
 
     @Test
-    public void testStats() throws IOException {
+    public void testStats() throws IOException, InterruptedException {
         SlippiGame game = new SlippiGame("slp/test.slp");
         StatsType stats = game.getStats();
 
-        assertEquals(stats.getStocks().size(), 5);
-        assertEquals(stats.getLastFrame(), 3694);
+        assertEquals(5, stats.getStocks().size());
+        assertEquals(Integer.valueOf(3694), stats.getLastFrame());
+        assertEquals(stats.getStocks().get(stats.getStocks().size() - 1).getDurationType().getEndFrame(),
+                Integer.valueOf(3694));
+        //
+        // Test conversions
+        assertEquals(10, stats.getConversions().size());
+        ConversionType firstConversion = stats.getConversions().get(0);
+        assertEquals(4, firstConversion.getMoves().size());
+        assertEquals(15, firstConversion.getMoves().get(0).getMoveId());
+        assertEquals(17, firstConversion.getMoves().get(firstConversion.getMoves().size() - 1).getMoveId());
+
+        // Test action counts
+        assertEquals(16, stats.getActionCounts().get(0).getWavedashCount());
+        assertEquals(1, stats.getActionCounts().get(0).getWavelandCount());
+        assertEquals(3, stats.getActionCounts().get(0).getAirDodgeCount());
+
+        // Test Overall
+        assertEquals(494, stats.getOverall().get(0).getInputCount());
     }
 
+    @Test
+    public void testMetaData() throws IOException {
+        SlippiGame game = new SlippiGame("slp/test.slp");
+        MetadataType metadata = game.getMetadata();
+
+        assertEquals("2017-12-18T21:14:14Z", metadata.getStartAt());
+        assertEquals("dolphin", metadata.getPlayedOn());
+    }
+
+    @Test
+    public void testIncomplete() throws IOException {
+        SlippiGame game = new SlippiGame("slp/incomplete.slp");
+        GameStartType settings = game.getSettings();
+
+        assertEquals(2, settings.getPlayers().size());
+        game.getMetadata();
+        game.getStats();
+    }
+
+    @Test
+    public void testNametags() throws IOException {
+        SlippiGame game = new SlippiGame("slp/nametags.slp");
+        GameStartType settings = game.getSettings();
+        assertEquals("ＡＭＮイ", settings.getPlayers().get(0).getNameTag());
+        assertEquals("", settings.getPlayers().get(1).getNameTag());
+
+        SlippiGame game2 = new SlippiGame("slp/nametags2.slp");
+        GameStartType settings2 = game2.getSettings();
+        assertEquals("Ａ１＝＄", settings2.getPlayers().get(0).getNameTag());
+        assertEquals("か、９＠", settings2.getPlayers().get(1).getNameTag());
+
+        SlippiGame game3 = new SlippiGame("slp/nametags3.slp");
+        GameStartType settings3 = game3.getSettings();
+        assertEquals("Ｂ　　Ｒ", settings3.getPlayers().get(0).getNameTag());
+        assertEquals("．　　。", settings3.getPlayers().get(1).getNameTag());
+    }
+
+    @Test
+    public void testIsPAL() throws IOException {
+        SlippiGame palGame = new SlippiGame("slp/pal.slp");
+        SlippiGame ntscGame = new SlippiGame("slp/ntsc.slp");
+
+        assertTrue(palGame.getSettings().isPAL());
+        assertFalse(ntscGame.getSettings().isPAL());
+    }
+
+    @Test
+    public void testControllerFixes() throws IOException {
+        SlippiGame game = new SlippiGame("slp/controllerFixes.slp");
+        GameStartType settings = game.getSettings();
+
+        assertEquals("Dween", settings.getPlayers().get(0).getControllerFix());
+        assertEquals("UCF", settings.getPlayers().get(1).getControllerFix());
+        assertEquals("None", settings.getPlayers().get(2).getControllerFix());
+    }
+
+    @Test
+    public void testBufferInput() throws IOException {
+        ByteBuffer buf = ByteBuffer.wrap(Files.readAllBytes(Paths.get("slp/sheik_vs_ics_yoshis.slp")));
+        SlippiGame game = new SlippiGame(buf);
+        GameStartType settings = game.getSettings();
+
+        assertEquals(Integer.valueOf(8), settings.getStageId());
+        assertEquals(Integer.valueOf(0x13), settings.getPlayers().get(0).getCharacterId());
+        assertEquals(Integer.valueOf(0xE),
+                settings.getPlayers().get(settings.getPlayers().size() - 1).getCharacterId());
+    }
+
+    @Test
+    public void testRealtime() {
+        // TODO: Implement this
+    }
 }

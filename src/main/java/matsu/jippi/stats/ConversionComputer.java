@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import matsu.jippi.enumeration.stats.Frames;
 import matsu.jippi.enumeration.stats.Timers;
 import matsu.jippi.pojo.common.ConversionMetadataType;
 import matsu.jippi.pojo.common.ConversionType;
@@ -84,12 +85,12 @@ public class ConversionComputer implements StatComputer<List<ConversionType>> {
     public void handleConversionCompute(FramesType frames, PlayerConversionState conversionState,
             PlayerIndexedType indices, FrameEntryType frame) {
         PostFrameUpdateType playerFrame = frame.getPlayers().get(indices.getPlayerIndex()).getPost();
-        PostFrameUpdateType prevPlayerFrame = frames.getFrames().get(frames.getFrames().size() - 2).getPlayers()
-                .get(indices.getPlayerIndex()).getPost();
+        PostFrameUpdateType prevPlayerFrame = frame.getFrame() == Frames.FIRST.getFrame() ? null
+                : frames.getFrames().get(frame.getFrame() - 1).getPlayers().get(indices.getPlayerIndex()).getPost();
 
         PostFrameUpdateType opponentFrame = frame.getPlayers().get(indices.getOpponentIndex()).getPost();
-        PostFrameUpdateType prevOpponentFrame = frames.getFrames().get(frames.getFrames().size() - 2).getPlayers()
-                .get(indices.getOpponentIndex()).getPost();
+        PostFrameUpdateType prevOpponentFrame = frame.getFrame() == Frames.FIRST.getFrame() ? null
+                : frames.getFrames().get(frame.getFrame() - 1).getPlayers().get(indices.getOpponentIndex()).getPost();
 
         boolean opntIsDamaged = StatsQuerier.isDamaged(opponentFrame.getActionStateId());
         boolean opntIsGrabbed = StatsQuerier.isGrabbed(opponentFrame.getActionStateId());
@@ -97,8 +98,8 @@ public class ConversionComputer implements StatComputer<List<ConversionType>> {
 
         boolean actionChangedSinceHit = playerFrame.getActionStateId() != conversionState.getLastHitAnimation();
         Float actionCounter = playerFrame.getActionStateCounter();
-        Float prevActionCounter = prevPlayerFrame.getActionStateCounter();
-        boolean actionFrameCounterReset = actionCounter < prevActionCounter;
+        Float prevActionCounter = prevPlayerFrame == null ? null : prevPlayerFrame.getActionStateCounter();
+        boolean actionFrameCounterReset = prevActionCounter != null && actionCounter < prevActionCounter;
         if (actionChangedSinceHit || actionFrameCounterReset) {
             conversionState.setLastHitAnimation(null);
         }

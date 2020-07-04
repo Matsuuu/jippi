@@ -39,10 +39,39 @@ public class ActionsComputer implements StatComputer<List<ActionCountsType>> {
 
     public List<ActionCountsType> fetch() {
         List<ActionCountsType> actionCounts = new ArrayList<>();
-        for (PlayerActionState actionState : state.values()) {
-            actionCounts.add(actionState.getPlayerCounts());
+        for (PlayerIndexedType indices : playerPermutations) {
+            actionCounts.add(this.state.get(indices).getPlayerCounts());
         }
         return actionCounts;
+    }
+
+    private List<Integer> getLast3Frames(PlayerActionState actionState) {
+        int listSize = actionState.getAnimations().size();
+        return listSize < 4 ? actionState.getAnimations()
+                : actionState.getAnimations().subList(listSize - 4, listSize - 1);
+    }
+
+    private int getCurrentAnimation(List<Integer> frames) {
+        if (frames.size() < 2) {
+            return frames.get(0);
+        }
+        return frames.get(frames.size() - 1);
+    }
+
+    private Integer getPreviousAnimation(List<Integer> frames) {
+        if (frames.size() < 2) {
+            return null;
+        }
+        return frames.get(frames.size() - 2);
+    }
+
+    private boolean isDashDanceAnimation(List<Integer> animations) {
+        for (int i = 0; i < animations.size(); i++) {
+            if (animations.get(i) != dashDanceAnimations.get(i).getHex()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void handleActionCompute(PlayerActionState actionState, PlayerIndexedType indices, FrameEntryType frame) {
@@ -51,14 +80,13 @@ public class ActionsComputer implements StatComputer<List<ActionCountsType>> {
         actionState.getAnimations().add(playerFrame.getActionStateId());
 
         // Grab last 3 frames
-        List<Integer> last3Frames = actionState.getAnimations().subList(actionState.getAnimations().size() - 4,
-                actionState.getAnimations().size() - 1);
+        List<Integer> last3Frames = getLast3Frames(actionState);
         int currentAnimation = playerFrame.getActionStateId();
-        int previousAnimation = last3Frames.get(last3Frames.size() - 2);
+        Integer previousAnimation = getPreviousAnimation(last3Frames);
         State currentAnimationState = State.from(currentAnimation);
         State previousAnimationState = State.from(previousAnimation);
 
-        boolean didDashDance = last3Frames.equals(dashDanceAnimations);
+        boolean didDashDance = isDashDanceAnimation(last3Frames);
         boolean didRoll = ActionQuerier.didStartSpotDodge(currentAnimationState, previousAnimationState);
         boolean didSpotDodge = ActionQuerier.didStartSpotDodge(currentAnimationState, previousAnimationState);
         boolean didAirDodge = ActionQuerier.didStartAirDodge(currentAnimationState, previousAnimationState);
@@ -70,37 +98,47 @@ public class ActionsComputer implements StatComputer<List<ActionCountsType>> {
         incrementCount(actionState, "airDodgeCount", didAirDodge);
         incrementCount(actionState, "ledgegrabCount", didGrabLedge);
 
-        List<State> animations = actionState.getAnimations().stream().map((animHex) -> State.from(animHex))
-                .collect(Collectors.toList());
+        List<State> animations = actionState.getAnimations().stream().map(State::from).collect(Collectors.toList());
 
-        handleActionWaveDash(actionState.getPlayerCounts(), animations);
+        handleActionWaveDash(actionState, animations);
     }
 
-    public void handleActionWaveDash(ActionCountsType counts, List<State> animations) {
-        State currentAnimation = animations.get(animations.size() - 1);
-        State previousAnimation = animations.get(animations.size() - 2);
+    public void handleActionWaveDash(PlayerActionState actionState, List<State> animations) {
+        State currentAnimation = animations.size() > 1 ? animations.get(animations.size() - 1) : animations.get(0);
+        State previousAnimation = animations.size() > 1 ? animations.get(animations.size() - 2) : null;
 
-        boolean isSpecialLanding = currentAnimation == State.LANDING_FALL_SPECIAL;
-        boolean isAcceptablePrevious = ActionQuerier.isWavedashInitiationAnimation(previousAnimation);
+        boolean isSpecialLanding = currentAnimation != null
+                && currentAnimation.getHex() == State.LANDING_FALL_SPECIAL.getHex();
+        boolean isAcceptablePrevious = previousAnimation != null
+                && ActionQuerier.isWavedashInitiationAnimation(previousAnimation);
         boolean isPossibleWavedash = isSpecialLanding && isAcceptablePrevious;
 
         if (!isPossibleWavedash) {
             return;
         }
 
-        List<State> recentFrames = animations.subList(animations.size() - 9, animations.size() - 1);
+        int startIndex = animations.size() - 8;
+        int endIndex = animations.size();
+        List<State> recentFrames = animations.subList(startIndex, endIndex);
+        Map<Integer, State> recentAnimations = new HashMap<>();
+        for (State recentFrame : recentFrames) {
+            if (recentFrame == null)
+                continue;
+            recentAnimations.put(recentFrame.getHex(), recentFrame);
+        }
 
-        if (recentFrames.size() == 2 && recentFrames.contains(State.AIR_DODGE)) {
+        if (recentAnimations.size() == 2 && recentAnimations.containsKey(State.AIR_DODGE.getHex())) {
             return;
         }
 
-        if (recentFrames.contains(State.AIR_DODGE)) {
-            counts.setAirDodgeCount(counts.getAirDodgeCount() + 1);
+        if (recentAnimations.containsKey(State.AIR_DODGE.getHex())) {
+            actionState.getPlayerCounts().decrementAirDodgeCount();
         }
-        if (recentFrames.contains(State.ACTION_KNEE_BEND)) {
-            counts.setWavedashCount(counts.getWavedashCount() + 1);
+
+        if (recentAnimations.containsKey(State.ACTION_KNEE_BEND.getHex())) {
+            actionState.getPlayerCounts().incrementWaveDashCount();
         } else {
-            counts.setWavelandCount(counts.getWavelandCount() + 1);
+            actionState.getPlayerCounts().incrementWavelandCount();
         }
     }
 
@@ -109,26 +147,20 @@ public class ActionsComputer implements StatComputer<List<ActionCountsType>> {
             return;
 
         switch (field) {
-            case "waveDashCount":
-                actionState.getPlayerCounts().setWavedashCount(actionState.getPlayerCounts().getWavedashCount() + 1);
-                break;
-            case "waveLandCount":
-                actionState.getPlayerCounts().setWavelandCount(actionState.getPlayerCounts().getWavelandCount() + 1);
-                break;
             case "airDodgeCount":
-                actionState.getPlayerCounts().setAirDodgeCount(actionState.getPlayerCounts().getAirDodgeCount() + 1);
+                actionState.getPlayerCounts().incrementAirDodgeCount();
                 break;
             case "dashDanceCount":
-                actionState.getPlayerCounts().setDashDanceCount(actionState.getPlayerCounts().getDashDanceCount() + 1);
+                actionState.getPlayerCounts().incrementDashDanceCount();
                 break;
             case "spotDodgeCount":
-                actionState.getPlayerCounts().setSpotDodgeCount(actionState.getPlayerCounts().getSpotDodgeCount() + 1);
+                actionState.getPlayerCounts().incrementSpotDodgeCount();
                 break;
             case "ledgegrabCount":
-                actionState.getPlayerCounts().setLedgegrabCount(actionState.getPlayerCounts().getLedgegrabCount() + 1);
+                actionState.getPlayerCounts().incrementLedgegrabCount();
                 break;
             case "rollCount":
-                actionState.getPlayerCounts().setRollCount(actionState.getPlayerCounts().getRollCount() + 1);
+                actionState.getPlayerCounts().incrementRollCount();
                 break;
         }
     }

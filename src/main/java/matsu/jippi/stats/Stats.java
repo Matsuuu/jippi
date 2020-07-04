@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import matsu.jippi.enumeration.stats.Frames;
-import matsu.jippi.pojo.common.FrameEntryType;
-import matsu.jippi.pojo.common.FramesType;
-import matsu.jippi.pojo.common.PlayerIndexedType;
-import matsu.jippi.pojo.common.PostFrameUpdateType;
-import matsu.jippi.pojo.common.StatOptions;
+import matsu.jippi.pojo.common.*;
 
 public class Stats {
 
@@ -65,8 +61,11 @@ public class Stats {
 
     public boolean isCompletedFrame(List<PlayerIndexedType> playerPermutations, FrameEntryType frame) {
         PlayerIndexedType indices = playerPermutations.get(0);
-        PostFrameUpdateType playerPostFrame = frame.getPlayers().get(indices.getPlayerIndex()).getPost();
-        PostFrameUpdateType oppPostFrame = frame.getPlayers().get(indices.getOpponentIndex()).getPost();
+        FrameEntryPlayerOrFollower player = frame.getPlayers().get(indices.getPlayerIndex());
+        FrameEntryPlayerOrFollower opponent = frame.getPlayers().get(indices.getOpponentIndex());
+
+        PostFrameUpdateType playerPostFrame = player != null ? player.getPost() : null;
+        PostFrameUpdateType oppPostFrame = opponent != null ? opponent.getPost() : null;
 
         return playerPostFrame != null && oppPostFrame != null;
     }

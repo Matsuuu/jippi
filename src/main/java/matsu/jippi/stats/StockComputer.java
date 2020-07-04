@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import matsu.jippi.enumeration.stats.Frames;
 import matsu.jippi.pojo.common.DamageType;
 import matsu.jippi.pojo.common.DurationType;
 import matsu.jippi.pojo.common.FrameEntryType;
@@ -46,7 +49,7 @@ public class StockComputer implements StatComputer<List<StockType>> {
             FrameEntryType frame) {
 
         PostFrameUpdateType playerFrame = frame.getPlayers().get(indices.getPlayerIndex()).getPost();
-        PostFrameUpdateType prevPlayerFrame = frames.getFrames().get(playerFrame.getFrame() - 1).getPlayers()
+        PostFrameUpdateType prevPlayerFrame = frame.getFrame() == Frames.FIRST.getFrame() ? null : frames.getFrames().get(playerFrame.getFrame() - 1).getPlayers()
                 .get(indices.getPlayerIndex()).getPost();
 
         if (stockState.getStock() == null) {
@@ -55,8 +58,7 @@ public class StockComputer implements StatComputer<List<StockType>> {
                 return;
             }
 
-            stockState = new StockState(
-                    new StockType(new PlayerIndexedType(indices.getPlayerIndex(), indices.getOpponentIndex()),
+            stockState.setStock(new StockType(new PlayerIndexedType(indices.getPlayerIndex(), indices.getOpponentIndex()),
                             new DurationType(playerFrame.getFrame(), null), new DamageType(0, 0, null),
                             playerFrame.getStocksRemaining(), null));
 

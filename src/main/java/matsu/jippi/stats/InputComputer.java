@@ -41,14 +41,14 @@ public class InputComputer implements StatComputer<List<PlayerInput>> {
             FrameEntryType frame) {
 
         PreFrameUpdateType playerFrame = frame.getPlayers().get(indices.getPlayerIndex()).getPre();
-        PreFrameUpdateType prevPlayerFrame = frames.getFrames().get(frames.getFrames().size() - 2).getPlayers()
+        PreFrameUpdateType prevPlayerFrame = frame.getFrame() == Frames.FIRST.getFrame() ? null : frames.getFrames().get(frame.getFrame() - 1).getPlayers()
                 .get(indices.getPlayerIndex()).getPre();
 
-        if (playerFrame.getFrame() < Frames.FIRST_PLAYABLE.getFrame()) {
+        if (playerFrame == null || playerFrame.getFrame() < Frames.FIRST_PLAYABLE.getFrame()) {
             return;
         }
 
-        Integer invertedPreviousButtons = ~prevPlayerFrame.getPhysicalButtons();
+        Integer invertedPreviousButtons = prevPlayerFrame == null ? null : ~prevPlayerFrame.getPhysicalButtons();
         Integer currentButtons = playerFrame.getPhysicalButtons();
         Integer buttonChanges = (invertedPreviousButtons & currentButtons) & 0xFFF;
         inputState.setInputCount(inputState.getInputCount() + countSetBits(buttonChanges));

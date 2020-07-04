@@ -62,7 +62,7 @@ public class StatsQuerier {
 
     public static Float calcDamageTaken(PostFrameUpdateType frame, PostFrameUpdateType prevFrame) {
         float percent = frame.getPercentOrZero();
-        float prevPercent = prevFrame.getPercentOrZero();
+        float prevPercent = prevFrame != null ? prevFrame.getPercentOrZero() : 0;
 
         return percent - prevPercent;
     }

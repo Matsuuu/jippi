@@ -23,6 +23,11 @@
       <artifactId>junit</artifactId>
       <version>4.13</version>
     </dependency>
+    <dependency>
+      <groupId>com.dev-smart</groupId>
+      <artifactId>ubjson</artifactId>
+      <version>0.1.8</version>
+    </dependency>
   </dependencies>
 
   <build>

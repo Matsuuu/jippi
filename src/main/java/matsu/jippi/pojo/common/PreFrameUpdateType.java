@@ -2,7 +2,7 @@ package matsu.jippi.pojo.common;
 
 import matsu.jippi.interfaces.EventPayloadTypes;
 
-public class PreFrameUpdateType implements EventPayloadTypes {
+public class PreFrameUpdateType extends FrameUpdateType implements EventPayloadTypes {
     private Integer frame;
     private Integer playerIndex;
     private boolean isFollower;

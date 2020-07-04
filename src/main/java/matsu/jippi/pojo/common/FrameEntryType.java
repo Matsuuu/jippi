@@ -10,6 +10,7 @@ public class FrameEntryType {
     private Map<Integer, FrameEntryPlayerOrFollower> players = new HashMap<>();
     private Map<Integer, FrameEntryPlayerOrFollower> followers = new HashMap<>();
     private List<ItemUpdateType> items = new ArrayList<>();
+    private boolean transferComplete;
 
     public int getFrame() {
         return frame;
@@ -51,6 +52,14 @@ public class FrameEntryType {
     }
 
     public FrameEntryType() {
+    }
+
+    public boolean isTransferComplete() {
+        return transferComplete;
+    }
+
+    public void setTransferComplete(boolean transferComplete) {
+        this.transferComplete = transferComplete;
     }
 
 }

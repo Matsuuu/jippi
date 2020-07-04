@@ -26,12 +26,20 @@ public class ActionCountsType {
         this.wavedashCount = wavedashCount;
     }
 
+    public void incrementWaveDashCount() {
+        this.wavedashCount++;
+    }
+
     public int getWavelandCount() {
         return wavelandCount;
     }
 
     public void setWavelandCount(int wavelandCount) {
         this.wavelandCount = wavelandCount;
+    }
+
+    public void incrementWavelandCount() {
+        this.wavelandCount++;
     }
 
     public int getAirDodgeCount() {
@@ -42,12 +50,24 @@ public class ActionCountsType {
         this.airDodgeCount = airDodgeCount;
     }
 
+    public void incrementAirDodgeCount() {
+        this.airDodgeCount++;
+    }
+
+    public void decrementAirDodgeCount() {
+        this.airDodgeCount--;
+    }
+
     public int getDashDanceCount() {
         return dashDanceCount;
     }
 
     public void setDashDanceCount(int dashDanceCount) {
         this.dashDanceCount = dashDanceCount;
+    }
+
+    public void incrementDashDanceCount() {
+        this.dashDanceCount++;
     }
 
     public int getSpotDodgeCount() {
@@ -58,6 +78,10 @@ public class ActionCountsType {
         this.spotDodgeCount = spotDodgeCount;
     }
 
+    public void incrementSpotDodgeCount() {
+        this.spotDodgeCount++;
+    }
+
     public int getLedgegrabCount() {
         return ledgegrabCount;
     }
@@ -66,12 +90,20 @@ public class ActionCountsType {
         this.ledgegrabCount = ledgegrabCount;
     }
 
+    public void incrementLedgegrabCount() {
+        this.ledgegrabCount++;
+    }
+
     public int getRollCount() {
         return rollCount;
     }
 
     public void setRollCount(int rollCount) {
         this.rollCount = rollCount;
+    }
+
+    public void incrementRollCount() {
+        this.rollCount++;
     }
 
     public ActionCountsType(PlayerIndexedType playerIndexedType, int wavedashCount, int wavelandCount,

@@ -1,5 +1,6 @@
 package matsu.jippi.util;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import matsu.jippi.interfaces.EventPayloadTypes;
 import matsu.jippi.pojo.common.FrameBookendType;
 import matsu.jippi.pojo.common.FrameEntryPlayerOrFollower;
 import matsu.jippi.pojo.common.FrameEntryType;
+import matsu.jippi.pojo.common.FrameUpdateType;
 import matsu.jippi.pojo.common.FramesType;
 import matsu.jippi.pojo.common.GameEndType;
 import matsu.jippi.pojo.common.GameStartType;
@@ -36,11 +38,12 @@ public class SlpParser {
         this.statsComputer = statsComputer;
     }
 
-    public int getLatestFrameNumber() {
+    public Integer getLatestFrameNumber() {
         return latestFrameIndex;
     }
 
     public int getPlayableFrameCount() {
+        if (latestFrameIndex == null) return 0;
         return latestFrameIndex < Frames.FIRST_PLAYABLE.getFrame() ? 0
                 : latestFrameIndex - Frames.FIRST_PLAYABLE.getFrame();
     }
@@ -75,7 +78,7 @@ public class SlpParser {
         playerPermutations = StatsQuerier.getSinglesPlayerPermutationsFromSettings(settings);
         statsComputer.setPlayerPermutations(playerPermutations);
 
-        if (payload.getSlpVersion().equals("1.6.0")) {
+        if (semVerGreaterThan(payload.getSlpVersion(), "1.6.0")) {
             settingsComplete = true;
         }
     }
@@ -102,56 +105,103 @@ public class SlpParser {
         settingsComplete = payload.getFrame() > Frames.FIRST.getFrame();
     }
 
-    public void handleFrameUpdate(Command command, PreFrameUpdateType payload) {
-        String field = payload.isFollower() ? "followers" : "players";
+    private FrameEntryPlayerOrFollower getFrameEntryPlayerOrFollower(FrameEntryType frameEntry, FrameUpdateType payload) {
+        if (frameEntry == null) {
+            return new FrameEntryPlayerOrFollower();
+        }
+        if (payload.isFollower()) {
+            if (frameEntry.getFollowers().containsKey(payload.getPlayerIndex())) {
+                return frameEntry.getFollowers().get(payload.getPlayerIndex());
+            }
+        } else {
+            if (frameEntry.getPlayers().containsKey(payload.getPlayerIndex())) {
+                return frameEntry.getPlayers().get(payload.getPlayerIndex());
+            }
+        }
+        return new FrameEntryPlayerOrFollower();
+    }
+
+    public void handleFrameUpdate(Command command, FrameUpdateType payload) {
         latestFrameIndex = payload.getFrame();
-        if (!frames.getFrames().containsKey(payload.getFrame())) {
-            frames.getFrames().put(payload.getFrame(), new FrameEntryType());
+
+        // Initialize frame and pof
+        FrameEntryType frameEntry = !frames.getFrames().containsKey(payload.getFrame()) ? new FrameEntryType()
+                : frames.getFrames().get(payload.getFrame());
+        FrameEntryPlayerOrFollower pof = getFrameEntryPlayerOrFollower(frameEntry, payload);
+
+        if (command == Command.PRE_FRAME_UPDATE) {
+            pof.setPre((PreFrameUpdateType) payload);
+        } else {
+            pof.setPost((PostFrameUpdateType) payload);
         }
 
-        FrameEntryPlayerOrFollower playerOrFollower;
-        if (field.equals("players")) {
-            playerOrFollower = frames.getFrames().get(payload.getFrame()).getPlayers().get(payload.getPlayerIndex());
+        // Set accordingly
+        if (payload.isFollower()) {
+            frameEntry.getFollowers().put(payload.getPlayerIndex(), pof);
         } else {
-            playerOrFollower = frames.getFrames().get(payload.getFrame()).getFollowers().get(payload.getPlayerIndex());
+            frameEntry.getPlayers().put(payload.getPlayerIndex(), pof);
         }
-        if (playerOrFollower == null) {
-            playerOrFollower = new FrameEntryPlayerOrFollower();
-        }
-        playerOrFollower.setPre(payload);
+        // Set frame data
+        frameEntry.setFrame(payload.getFrame());
+        // Append to frames
+        frames.getFrames().put(payload.getFrame(), frameEntry);
 
         GameStartType settings = getSettings();
-        if (settings == null || settings.getSlpVersion().equals("2.2.0")) {
+        if (settings == null || semVerLessThan(settings.getSlpVersion(), "2.2.0")) {
             statsComputer.addFrame(frames.getFrames().get(payload.getFrame()));
         } else {
-            frames.getFrames().put(payload.getFrame(), new FrameEntryType());
+            frames.getFrames().get(payload.getFrame()).setTransferComplete(false);
         }
     }
 
-    public void handleFrameUpdate(Command command, PostFrameUpdateType payload) {
-        String field = payload.isFollower() ? "followers" : "players";
-        latestFrameIndex = payload.getFrame();
-        if (!frames.getFrames().containsKey(payload.getFrame())) {
-            frames.getFrames().put(payload.getFrame(), new FrameEntryType());
-        }
+    private boolean semVerLessThan(String version, String target) {
+        if (version.equals(target))
+            return true;
 
-        FrameEntryPlayerOrFollower playerOrFollower;
-        if (field.equals("players")) {
-            playerOrFollower = frames.getFrames().get(payload.getFrame()).getPlayers().get(payload.getPlayerIndex());
-        } else {
-            playerOrFollower = frames.getFrames().get(payload.getFrame()).getFollowers().get(payload.getPlayerIndex());
-        }
-        if (playerOrFollower == null) {
-            playerOrFollower = new FrameEntryPlayerOrFollower();
-        }
-        playerOrFollower.setPost(payload);
+        String[] versionNumbers = version.split("\\.");
+        String[] targetNumbers = target.split("\\.");
 
-        GameStartType settings = getSettings();
-        if (settings == null || settings.getSlpVersion().equals("2.2.0")) {
-            statsComputer.addFrame(frames.getFrames().get(payload.getFrame()));
-        } else {
-            frames.getFrames().put(payload.getFrame(), new FrameEntryType());
-        }
+        int versionMajor = Integer.parseInt(versionNumbers[0]);
+        int versionMinor = Integer.parseInt(versionNumbers[1]);
+        int versionPatch = Integer.parseInt(versionNumbers[2]);
+
+        int targetMajor = Integer.parseInt(targetNumbers[0]);
+        int targetMinor = Integer.parseInt(targetNumbers[1]);
+        int targetPatch = Integer.parseInt(targetNumbers[2]);
+
+        if (versionMajor < targetMajor)
+            return true;
+        if (versionMajor == targetMajor && versionMinor < targetMinor)
+            return true;
+        if (versionMajor == targetMajor && versionMinor == targetMinor && versionPatch <= targetPatch)
+            return true;
+
+        return false;
+    }
+
+    private boolean semVerGreaterThan(String version, String target) {
+        if (version.equals(target))
+            return true;
+
+        String[] versionNumbers = version.split("\\.");
+        String[] targetNumbers = target.split("\\.");
+
+        int versionMajor = Integer.parseInt(versionNumbers[0]);
+        int versionMinor = Integer.parseInt(versionNumbers[1]);
+        int versionPatch = Integer.parseInt(versionNumbers[2]);
+
+        int targetMajor = Integer.parseInt(targetNumbers[0]);
+        int targetMinor = Integer.parseInt(targetNumbers[1]);
+        int targetPatch = Integer.parseInt(targetNumbers[2]);
+
+        if (versionMajor > targetMajor)
+            return true;
+        if (versionMajor == targetMajor && versionMinor > targetMinor)
+            return true;
+        if (versionMajor == targetMajor && versionMinor == targetMinor && versionPatch >= targetPatch)
+            return true;
+
+        return false;
     }
 
     public void handleItemUpdate(Command command, ItemUpdateType payload) {

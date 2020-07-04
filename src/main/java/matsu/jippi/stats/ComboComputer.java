@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import matsu.jippi.enumeration.stats.Frames;
 import matsu.jippi.enumeration.stats.Timers;
 import matsu.jippi.pojo.common.ComboState;
 import matsu.jippi.pojo.common.ComboType;
@@ -20,7 +21,7 @@ public class ComboComputer implements StatComputer<List<ComboType>> {
 
     private List<PlayerIndexedType> playerPermutations = new ArrayList<>();
     private Map<PlayerIndexedType, ComboState> state = new HashMap<>();
-    private List<ComboType> combos;
+    private List<ComboType> combos = new ArrayList<>();
 
     public void setPlayerPermutations(List<PlayerIndexedType> playerPermutations) {
         this.playerPermutations = playerPermutations;
@@ -45,11 +46,11 @@ public class ComboComputer implements StatComputer<List<ComboType>> {
             FrameEntryType frame) {
 
         PostFrameUpdateType playerFrame = frame.getPlayers().get(indices.getPlayerIndex()).getPost();
-        PostFrameUpdateType prevPlayerFrame = frames.getFrames().get(frames.getFrames().size() - 2).getPlayers()
+        PostFrameUpdateType prevPlayerFrame = frame.getFrame() == Frames.FIRST.getFrame() ? null : frames.getFrames().get(playerFrame.getFrame() - 1).getPlayers()
                 .get(indices.getPlayerIndex()).getPost();
 
         PostFrameUpdateType opponentFrame = frame.getPlayers().get(indices.getOpponentIndex()).getPost();
-        PostFrameUpdateType prevOpponentFrame = frames.getFrames().get(frames.getFrames().size() - 2).getPlayers()
+        PostFrameUpdateType prevOpponentFrame = frame.getFrame() == Frames.FIRST.getFrame() ? null : frames.getFrames().get(playerFrame.getFrame() - 1).getPlayers()
                 .get(indices.getOpponentIndex()).getPost();
 
         boolean opntIsDamaged = StatsQuerier.isDamaged(opponentFrame.getActionStateId());
@@ -58,8 +59,8 @@ public class ComboComputer implements StatComputer<List<ComboType>> {
 
         boolean actionChangedSinceHit = playerFrame.getActionStateId() != comboState.getLastHitAnimation();
         Float actionCounter = playerFrame.getActionStateCounter();
-        Float prevActionCounter = prevPlayerFrame.getActionStateCounter();
-        boolean actionFrameCounterReset = actionCounter < prevActionCounter;
+        Float prevActionCounter = prevPlayerFrame != null ? prevPlayerFrame.getActionStateCounter() : null;
+        boolean actionFrameCounterReset = prevActionCounter != null && actionCounter < prevActionCounter;
         if (actionChangedSinceHit || actionFrameCounterReset) {
             comboState.setLastHitAnimation(null);
         }

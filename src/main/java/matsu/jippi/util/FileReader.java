@@ -10,10 +10,7 @@ import java.nio.file.Paths;
 public class FileReader {
     public static FileInputStream readFileFromPath(String filePath) {
         try {
-            Path currentDir = Paths.get(".");
-            String currentDirPath = currentDir.toAbsolutePath().toString();
-            String fullPath = currentDirPath.substring(0, currentDirPath.length() - 2) + "/" + filePath;
-
+            String fullPath = FileReader.getFullPath(filePath);
             File file = new File(fullPath);
             FileInputStream fis = new FileInputStream(file);
             return fis;
@@ -21,5 +18,12 @@ public class FileReader {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static String getFullPath(String filePath) {
+        Path currentDir = Paths.get(".");
+        String currentDirPath = currentDir.toAbsolutePath().toString();
+        String fullPath = currentDirPath.substring(0, currentDirPath.length() - 2) + "/" + filePath;
+        return fullPath;
     }
 }

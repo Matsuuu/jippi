@@ -1,31 +1,22 @@
 package matsu.jippi.util;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import matsu.jippi.enumeration.slpreader.Command;
-import matsu.jippi.enumeration.slpreader.SlpInputSource;
 import matsu.jippi.interfaces.EventCallbackFunc;
 import matsu.jippi.interfaces.EventPayloadTypes;
 import matsu.jippi.interfaces.SlpRefType;
-import matsu.jippi.pojo.common.FrameBookendType;
-import matsu.jippi.pojo.common.GameEndType;
-import matsu.jippi.pojo.common.GameStartType;
-import matsu.jippi.pojo.common.ItemUpdateType;
-import matsu.jippi.pojo.common.MetadataType;
-import matsu.jippi.pojo.common.PlayerType;
-import matsu.jippi.pojo.common.PostFrameUpdateType;
-import matsu.jippi.pojo.common.PreFrameUpdateType;
+import matsu.jippi.pojo.common.*;
 import matsu.jippi.pojo.slpreader.SlpBufferSourceRef;
 import matsu.jippi.pojo.slpreader.SlpFileSourceRef;
 import matsu.jippi.pojo.slpreader.SlpFileType;
 import matsu.jippi.pojo.slpreader.SlpReadInput;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.lang.Character;
 
 public class SlpReader {
 
@@ -43,7 +34,16 @@ public class SlpReader {
     public int readRef(SlpRefType ref, ByteBuffer buffer, int offset, int length, int position) throws IOException {
         switch (ref.getSource()) {
             case BUFFER:
-                return 0;
+                SlpBufferSourceRef bufferSourceRef = (SlpBufferSourceRef) ref;
+                byte[] bufferBytes = bufferSourceRef.getBuffer().array();
+                byte[] targetBytes = new byte[length];
+                ByteBuffer copiedBuffer = ByteBuffer.wrap(bufferBytes);
+                copiedBuffer.position(position);
+                copiedBuffer.get(targetBytes, offset, length);
+
+                buffer.position(offset);
+                buffer.put(targetBytes);
+                return buffer.position();
             case FILE:
                 SlpFileSourceRef fileSourceRef = (SlpFileSourceRef) ref;
 
@@ -60,7 +60,7 @@ public class SlpReader {
     public int getLenRef(SlpRefType ref) throws IOException {
         switch (ref.getSource()) {
             case BUFFER:
-                return ((SlpBufferSourceRef) ref).getBuffer().position();
+                return ((SlpBufferSourceRef) ref).getBuffer().capacity();
             case FILE:
                 return (int) ((SlpFileSourceRef) ref).getFileInputStream().getChannel().size();
             default:
@@ -114,7 +114,12 @@ public class SlpReader {
         ByteBuffer buffer = ByteBuffer.allocate(4);
         readRef(ref, buffer, 0, buffer.capacity(), position - 4);
 
-        int rawDataLength = buffer.get(0) << 24 | buffer.get(1) << 16 | buffer.get(2) << 8 | buffer.get(3);
+        int b1 = Byte.toUnsignedInt(buffer.get(0)) << 24;
+        int b2 = Byte.toUnsignedInt(buffer.get(1)) << 16;
+        int b3 = Byte.toUnsignedInt(buffer.get(2)) << 8;
+        int b4 = Byte.toUnsignedInt(buffer.get(3));
+
+        int rawDataLength = b1 | b2 | b3 | b4;
         if (rawDataLength > 0) {
             return rawDataLength;
         }
@@ -149,7 +154,7 @@ public class SlpReader {
         readRef(ref, messageSizesBuffer, 0, messageSizesBuffer.capacity(), position + 2);
         for (int i = 0; i < payloadLength - 1; i += 3) {
             int command = messageSizesBuffer.get(i);
-            messageSizes.put(command, messageSizesBuffer.get(i + 1) << 8 | messageSizesBuffer.get(i + 2));
+            messageSizes.put(command, (int) messageSizesBuffer.getShort(i + 1));
         }
         return messageSizes;
     }
@@ -210,7 +215,21 @@ public class SlpReader {
                         cfOption = "Dween";
                     }
 
-                    String nameTag = "";
+                    int nametagOffset = playerIndex * 0x10;
+
+                    int nametagStart = 0x161 + nametagOffset;
+                    byte[] nametagBufferContent = new byte[16];
+                    String nameTag = null;
+                    if (nametagStart + 16 < payload.capacity()) {
+                        payload.position(nametagStart);
+                        payload.get(nametagBufferContent, 0, 16);
+                        ByteBuffer nametagBuffer = ByteBuffer.wrap(nametagBufferContent);
+                        try {
+                            nameTag = new String(nametagBuffer.array(), "Shift_JIS").trim();
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     int offset = playerIndex * 0x24;
 
                     return new PlayerType(playerIndex, playerIndex + 1, readUInt8(payload, 0x65 + offset),
@@ -220,7 +239,7 @@ public class SlpReader {
 
                 return new GameStartType(
                         readUInt8(payload, 0x1) + "." + readUInt8(payload, 0x2) + "." + readUInt8(payload, 0x3),
-                        readBool(payload, 0xD), readBool(payload, 0x1A1), readUInt16(payload, 0x14), players);
+                        readBool(payload, 0xD), readBool(payload, 0x1A1), readUInt16(payload, 0x13), players);
             case PRE_FRAME_UPDATE:
                 return new PreFrameUpdateType(readInt32(payload, 0x1), readUInt8(payload, 0x5), readBool(payload, 0x6),
                         readUInt32(payload, 0x7), readUInt16(payload, 0xB), readFloat(payload, 0xD),
@@ -255,10 +274,7 @@ public class SlpReader {
         ByteBuffer buffer = ByteBuffer.allocate(slpFile.getMetadataLength());
         readRef(slpFile.getRef(), buffer, 0, buffer.capacity(), slpFile.getMetadataPosition());
 
-        MetadataType metadata = null;
-        // TODO: Figure out the decode
-        //
-        return metadata;
+        return MetadataType.parseUBObject(buffer);
     }
 
     boolean canReadFromPayload(ByteBuffer payload, int offset, int length) {
@@ -291,10 +307,10 @@ public class SlpReader {
     }
 
     Integer readUInt16(ByteBuffer payload, int offset) {
-        return canReadFromPayload(payload, offset, 2) ? Byte.toUnsignedInt(payload.get(offset)) : null;
+        return canReadFromPayload(payload, offset, 2) ? Short.toUnsignedInt(payload.getShort(offset)) : null;
     }
 
     boolean readBool(ByteBuffer payload, int offset) {
-        return canReadFromPayload(payload, offset, 1) ? payload.getInt(offset) == 1 : false;
+        return canReadFromPayload(payload, offset, 1) && payload.get(offset) == 1;
     }
 }

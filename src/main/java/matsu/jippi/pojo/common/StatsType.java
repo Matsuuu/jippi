@@ -4,15 +4,15 @@ import java.util.List;
 
 public class StatsType {
     private boolean gameComplete;
-    private int lastFrame;
-    private int playableFrameCount;
+    private Integer lastFrame;
+    private Integer playableFrameCount;
     private List<StockType> stocks;
     private List<ConversionType> conversions;
     private List<ComboType> combos;
     private List<ActionCountsType> actionCounts;
     private List<OverallType> overall;
 
-    public StatsType(boolean gameComplete, int lastFrame, int playableFrameCount, List<StockType> stocks,
+    public StatsType(boolean gameComplete, Integer lastFrame, Integer playableFrameCount, List<StockType> stocks,
             List<ConversionType> conversions, List<ComboType> combos, List<ActionCountsType> actionCounts,
             List<OverallType> overall) {
         this.gameComplete = gameComplete;
@@ -33,19 +33,19 @@ public class StatsType {
         this.gameComplete = gameComplete;
     }
 
-    public int getLastFrame() {
+    public Integer getLastFrame() {
         return lastFrame;
     }
 
-    public void setLastFrame(int lastFrame) {
+    public void setLastFrame(Integer lastFrame) {
         this.lastFrame = lastFrame;
     }
 
-    public int getPlayableFrameCount() {
+    public Integer getPlayableFrameCount() {
         return playableFrameCount;
     }
 
-    public void setPlayableFrameCount(int playableFrameCount) {
+    public void setPlayableFrameCount(Integer playableFrameCount) {
         this.playableFrameCount = playableFrameCount;
     }
 
