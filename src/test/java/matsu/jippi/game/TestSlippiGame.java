@@ -2,10 +2,14 @@ package matsu.jippi.game;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 import matsu.jippi.pojo.common.MetadataType;
+import matsu.jippi.util.FileReader;
 import org.junit.Test;
 
 import matsu.jippi.enumeration.melee.Stages;
@@ -16,6 +20,8 @@ import matsu.jippi.pojo.common.StatsType;
 import static org.junit.Assert.*;
 
 public class TestSlippiGame {
+
+    private int copyPos = 0;
 
     @Test
     public void testReadSettings() throws IOException {
@@ -121,7 +127,50 @@ public class TestSlippiGame {
     }
 
     @Test
-    public void testRealtime() {
+    public void testRealtime() throws Exception {
         // TODO: Implement this
+        /*ByteBuffer fullData = ByteBuffer.wrap(Files.readAllBytes(Paths.get("slp/realtimeTest.slp")));
+        ByteBuffer buf = ByteBuffer.allocate((int) 100e6);
+
+        SlippiGame game = new SlippiGame(buf);
+        RealtimeDataObject data;
+        copyPos = 0;
+
+        Callable<RealtimeDataObject> getData = () -> {
+            try {
+                return new RealtimeDataObject(game.getSettings(), game.getFrames(),
+                        game.getMetadata(), game.getGameEnd(), game.getStats(),
+                        game.getLatestFrame());
+            } catch (IOException e) {
+                return new RealtimeDataObject();
+            }
+        };
+
+        data = getData.call();
+        assertNull(data.getSettings());
+
+        copyBuf(fullData, buf, 0x1D);
+        data = getData.call();
+        copyBuf(fullData, buf, 0x1A3);
+
+        data = getData.call();
+        assertEquals(Integer.valueOf(8), data.getSettings().getStageId());
+
+        copyBuf(fullData, buf, 0xE8 * 3);
+        data = getData.call();
+        assertEquals(3, data.getFrames().getFrames().size());
+        assertEquals(-122, data.getLatestFrame().getFrame());
+        assertNull(data.getStats().getStocks().get(1).getDurationType().getEndFrame());*/
+
+
+    }
+
+    private void copyBuf(ByteBuffer fullData, ByteBuffer buf, int length) {
+        byte[] bytes = new byte[length];
+        fullData.position(copyPos);
+        fullData.get(bytes, 0, length);
+        buf.position(copyPos);
+        buf.put(bytes);
+        copyPos += length;
     }
 }

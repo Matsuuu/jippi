@@ -19,8 +19,11 @@ public class MetadataType {
         try {
             UBReader reader = new UBReader(new ByteArrayInputStream(buffer.array()));
             UBValue value = reader.read();
-            UBObject metaDataJson = value.asObject();
+            UBObject metaDataJson = value != null ? value.asObject() : null;
             reader.close();
+            if (metaDataJson == null) {
+                return null;
+            }
 
             UBValue startAt = metaDataJson.getOrDefault("startAt", null);
             UBValue playedOn = metaDataJson.getOrDefault("playedOn", null);
