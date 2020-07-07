@@ -55,7 +55,7 @@ public class ComboComputer implements StatComputer<List<ComboType>> {
 
         boolean opntIsDamaged = StatsQuerier.isDamaged(opponentFrame.getActionStateId());
         boolean opntIsGrabbed = StatsQuerier.isGrabbed(opponentFrame.getActionStateId());
-        Float opntDamageTaken = StatsQuerier.calcDamageTaken(opponentFrame, prevOpponentFrame);
+        float opntDamageTaken = StatsQuerier.calcDamageTaken(opponentFrame, prevOpponentFrame);
 
         boolean actionChangedSinceHit = playerFrame.getActionStateId() != comboState.getLastHitAnimation();
         Float actionCounter = playerFrame.getActionStateCounter();
@@ -76,7 +76,7 @@ public class ComboComputer implements StatComputer<List<ComboType>> {
                 combos.add(comboState.getCombo());
             }
 
-            if (opntDamageTaken != null && opntDamageTaken > 0) {
+            if (opntDamageTaken > 0) {
                 if (comboState.getLastHitAnimation() == null) {
                     comboState.setMove(
                             new MoveLandedType(playerFrame.getFrame(), playerFrame.getLastAttackLanded(), 0, 0));
@@ -126,9 +126,10 @@ public class ComboComputer implements StatComputer<List<ComboType>> {
         if (shouldTerminate) {
             comboState.getCombo().getDurationType().setEndFrame(playerFrame.getFrame());
             comboState.getCombo().getDamageType().setEndPercent(prevOpponentFrame.getPercentOrZero());
+
+            comboState.setCombo(null);
+            comboState.setMove(null);
         }
 
-        comboState.setCombo(null);
-        comboState.setMove(null);
     }
 }

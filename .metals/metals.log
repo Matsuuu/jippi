@@ -1,0 +1,5 @@
+2020.07.07 17:15:16 INFO  started: Metals version 0.9.1 in workspace '/home/matsu/projects/jippi'
+2020.07.07 17:15:18 INFO  time: initialize in 2.44s
+2020.07.07 17:15:50 INFO  started: Metals version 0.9.1 in workspace '/home/matsu/projects/jippi'
+2020.07.07 17:15:51 INFO  time: initialize in 1.89s
+2020.07.07 17:15:52 INFO  skipping build import with status 'Dismissed'
