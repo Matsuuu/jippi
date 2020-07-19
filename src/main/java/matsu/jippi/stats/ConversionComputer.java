@@ -1,9 +1,7 @@
 package matsu.jippi.stats;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import matsu.jippi.enumeration.stats.Frames;
@@ -53,7 +51,7 @@ public class ConversionComputer implements StatComputer<List<ConversionType>> {
         List<ConversionType> conversionsToHandle = conversions.stream()
                 .filter(con -> con.getOpeningType().equals("unknown")).collect(Collectors.toList());
 
-        Map<Integer, List<ConversionType>> sortedConversions = new HashMap<>();
+        Map<Integer, List<ConversionType>> sortedConversions = new LinkedHashMap<>();
         for (ConversionType con : conversionsToHandle) {
 
             int startFrame = con.getDurationType().getStartFrame();

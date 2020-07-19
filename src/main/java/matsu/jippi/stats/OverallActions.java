@@ -25,7 +25,7 @@ public class OverallActions {
         Map<Integer, List<ConversionType>> conversionsByPlayer = getConversionsByPlayer(conversions);
         ConversionByPlayerByOpening conversionsByPlayerByOpening = getConversionsByPlayerByOpening(conversionsByPlayer);
 
-        int gameMinutes = playableFrameCount / 3600;
+        float gameMinutes = playableFrameCount / 3600.0f;
 
         List<OverallType> overall = new ArrayList<>();
         for (PlayerIndexedType playerIndexType : playerIndices) {
@@ -45,7 +45,7 @@ public class OverallActions {
             List<StockType> opponentEndedStocks = opponentStocks.stream()
                     .filter(sto -> sto.getDurationType().getEndFrame() != null).collect(Collectors.toList());
 
-            int totalDamage = getTotalDamage(opponentStocks);
+            float totalDamage = getTotalDamage(opponentStocks);
 
             int conversionCount = playerConversions.size();
             int successfulConversionCount = successfulConversions.size();
@@ -53,7 +53,7 @@ public class OverallActions {
 
             overall.add(new OverallType(playerIndexType, inputCount, conversionCount, totalDamage, killCount,
                     getRatio(successfulConversionCount, conversionCount), getRatio(inputCount, gameMinutes),
-                    getRatio(conversionCount, killCount), getRatio(totalDamage, conversionCount),
+                    getRatio(conversionCount, killCount), getRatio(totalDamage, (float) conversionCount),
                     getOpeningRatio(conversionsByPlayerByOpening, playerIndexType.getPlayerIndex(),
                             playerIndexType.getOpponentIndex(), "neutral-win"),
                     getOpeningRatio(conversionsByPlayerByOpening, playerIndexType.getPlayerIndex(),
@@ -66,7 +66,11 @@ public class OverallActions {
     }
 
     private static RatioType getRatio(int count, Integer total) {
-        return new RatioType(count, total, total != null && total != 0 ? count / total : null);
+        return new RatioType(count, total, total != 0 ? (float) count / total : null);
+    }
+
+    private static RatioType getRatio(float count, Float total) {
+        return new RatioType(count, total, total != 0 ? count / total : null);
     }
 
     private static RatioType getOpeningRatio(ConversionByPlayerByOpening conversionsByPlayerByOpening, int playerIndex,
@@ -82,6 +86,12 @@ public class OverallActions {
         List<ConversionType> opponentOpenings = conversion.get(opponentIndexAsString) != null
                 ? conversion.get(opponentIndexAsString).get(type)
                 : new ArrayList<>();
+        if (openings == null) {
+            openings = new ArrayList<>();
+        }
+        if (opponentOpenings == null) {
+            opponentOpenings = new ArrayList<>();
+        }
 
         return getRatio(openings.size(), openings.size() + opponentOpenings.size());
     }
@@ -179,8 +189,8 @@ public class OverallActions {
         return new ConversionByPlayerByOpening(conversionsByPlayerByOpening);
     }
 
-    private static int getTotalDamage(List<StockType> stocks) {
-        int totalDamage = 0;
+    private static float getTotalDamage(List<StockType> stocks) {
+        float totalDamage = 0;
         for (StockType stock : stocks) {
             totalDamage += stock.getDamageType().getCurrentPercent();
         }

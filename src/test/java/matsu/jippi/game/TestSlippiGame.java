@@ -119,6 +119,7 @@ public class TestSlippiGame {
         ByteBuffer buf = ByteBuffer.wrap(Files.readAllBytes(Paths.get("slp/sheik_vs_ics_yoshis.slp")));
         SlippiGame game = new SlippiGame(buf);
         GameStartType settings = game.getSettings();
+        StatsType stats = game.getStats();
 
         assertEquals(Integer.valueOf(8), settings.getStageId());
         assertEquals(Integer.valueOf(0x13), settings.getPlayers().get(0).getCharacterId());

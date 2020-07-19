@@ -4,7 +4,7 @@ public class OverallType {
     private PlayerIndexedType playerIndexedType;
     private int inputCount;
     private int conversionCount;
-    private int totalDamage;
+    private float totalDamage;
     private int killCount;
     private RatioType successfulConversion;
     private RatioType inputsPerMinute;
@@ -38,11 +38,11 @@ public class OverallType {
         this.conversionCount = conversionCount;
     }
 
-    public int getTotalDamage() {
+    public float getTotalDamage() {
         return totalDamage;
     }
 
-    public void setTotalDamage(int totalDamage) {
+    public void setTotalDamage(float totalDamage) {
         this.totalDamage = totalDamage;
     }
 
@@ -110,7 +110,7 @@ public class OverallType {
         this.beneficialTradeRatio = beneficialTradeRatio;
     }
 
-    public OverallType(PlayerIndexedType playerIndexedType, int inputCount, int conversionCount, int totalDamage,
+    public OverallType(PlayerIndexedType playerIndexedType, int inputCount, int conversionCount, float totalDamage,
             int killCount, RatioType successfulConversion, RatioType inputsPerMinute, RatioType openingsPerKill,
             RatioType damagePerOpening, RatioType neutralWinRatio, RatioType counterHitRatio,
             RatioType beneficialTradeRatio) {

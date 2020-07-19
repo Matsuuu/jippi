@@ -51,7 +51,7 @@
                     { "frame": 215, "moveId": 21, "hitCount": 1, "damage": 8.0 },
                     { "frame": 338, "moveId": 17, "hitCount": 1, "damage": 9.0 }
                 ],
-                "openingType": "counter-attack",
+                "openingType": "neutral-win",
                 "didKill": false
             },
             {
@@ -70,7 +70,7 @@
                     { "frame": 605, "moveId": 13, "hitCount": 1, "damage": 12.0 },
                     { "frame": 743, "moveId": 17, "hitCount": 1, "damage": 11.160004 }
                 ],
-                "openingType": "counter-attack",
+                "openingType": "neutral-win",
                 "didKill": true
             },
             {
@@ -86,7 +86,7 @@
                 "durationType": { "startFrame": 1159, "endFrame": 1223 },
                 "damageType": { "startPercent": 0.0, "currentPercent": 14.55, "endPercent": 14.55 },
                 "moves": [{ "frame": 1159, "moveId": 15, "hitCount": 1, "damage": 14.55 }],
-                "openingType": "counter-attack",
+                "openingType": "neutral-win",
                 "didKill": false
             },
             {
@@ -98,7 +98,7 @@
                     { "frame": 1254, "moveId": 21, "hitCount": 1, "damage": 7.7599983 },
                     { "frame": 1416, "moveId": 13, "hitCount": 1, "damage": 11.400002 }
                 ],
-                "openingType": "counter-attack",
+                "openingType": "neutral-win",
                 "didKill": false
             },
             {
@@ -117,7 +117,7 @@
                     { "frame": 1935, "moveId": 15, "hitCount": 1, "damage": 13.800003 },
                     { "frame": 2075, "moveId": 10, "hitCount": 1, "damage": 17.0 }
                 ],
-                "openingType": "counter-attack",
+                "openingType": "neutral-win",
                 "didKill": true
             },
             {
@@ -125,7 +125,7 @@
                 "durationType": { "startFrame": 1571, "endFrame": 1665 },
                 "damageType": { "startPercent": 15.92, "currentPercent": 17.92, "endPercent": 17.92 },
                 "moves": [{ "frame": 1571, "moveId": 2, "hitCount": 1, "damage": 2.0 }],
-                "openingType": "neutral-win",
+                "openingType": "counter-attack",
                 "didKill": false
             },
             {
@@ -347,29 +347,29 @@
                 "playerIndexedType": { "playerIndex": 0, "opponentIndex": 2 },
                 "inputCount": 494,
                 "conversionCount": 8,
-                "totalDamage": 358,
+                "totalDamage": 359.28003,
                 "killCount": 4,
-                "successfulConversion": { "count": 6, "total": 8, "ratio": 0 },
-                "inputsPerMinute": { "count": 494, "total": 1, "ratio": 494 },
-                "openingsPerKill": { "count": 8, "total": 4, "ratio": 2 },
-                "damagePerOpening": { "count": 358, "total": 8, "ratio": 44 },
-                "neutralWinRatio": { "count": 3, "total": 4, "ratio": 0 },
-                "counterHitRatio": { "count": 5, "total": 6, "ratio": 0 },
-                "beneficialTradeRatio": { "count": 0, "total": 0, "ratio": null }
+                "successfulConversion": { "count": 6.0, "total": 8.0, "ratio": 0.75 },
+                "inputsPerMinute": { "count": 494.0, "total": 1.0369444, "ratio": 476.3997 },
+                "openingsPerKill": { "count": 8.0, "total": 4.0, "ratio": 2.0 },
+                "damagePerOpening": { "count": 359.28003, "total": 8.0, "ratio": 44.910004 },
+                "neutralWinRatio": { "count": 8.0, "total": 8.0, "ratio": 1.0 },
+                "counterHitRatio": { "count": 0.0, "total": 2.0, "ratio": 0.0 },
+                "beneficialTradeRatio": { "count": 0.0, "total": 0.0, "ratio": null }
             },
             {
                 "playerIndexedType": { "playerIndex": 2, "opponentIndex": 0 },
                 "inputCount": 124,
                 "conversionCount": 2,
-                "totalDamage": 17,
+                "totalDamage": 17.92,
                 "killCount": 0,
-                "successfulConversion": { "count": 0, "total": 2, "ratio": 0 },
-                "inputsPerMinute": { "count": 124, "total": 1, "ratio": 124 },
-                "openingsPerKill": { "count": 2, "total": 0, "ratio": null },
-                "damagePerOpening": { "count": 17, "total": 2, "ratio": 8 },
-                "neutralWinRatio": { "count": 1, "total": 4, "ratio": 0 },
-                "counterHitRatio": { "count": 1, "total": 6, "ratio": 0 },
-                "beneficialTradeRatio": { "count": 0, "total": 0, "ratio": null }
+                "successfulConversion": { "count": 0.0, "total": 2.0, "ratio": 0.0 },
+                "inputsPerMinute": { "count": 124.0, "total": 1.0369444, "ratio": 119.582115 },
+                "openingsPerKill": { "count": 2.0, "total": 0.0, "ratio": null },
+                "damagePerOpening": { "count": 17.92, "total": 2.0, "ratio": 8.96 },
+                "neutralWinRatio": { "count": 0.0, "total": 8.0, "ratio": 0.0 },
+                "counterHitRatio": { "count": 2.0, "total": 2.0, "ratio": 1.0 },
+                "beneficialTradeRatio": { "count": 0.0, "total": 0.0, "ratio": null }
             }
         ]
     },
